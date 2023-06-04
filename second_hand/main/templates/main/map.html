@@ -1,0 +1,41 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Карта
+{% endblock %}
+
+{% block content %}
+<table class="text" >
+  <tr>
+      <td>
+          <div style="position:relative;overflow:hidden;">
+            <a href="https://yandex.by/maps/157/minsk/search/%D1%81%D0%B5%D0%BA%D0%BE%D0%BD%D0%B4%20%D1%85%D0%B5%D0%BD%D0%B4/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:0px;">секонд хенд в Минске</a>
+            <a href="https://yandex.by/maps/157/minsk/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:14px;">Минск</a><iframe src="https://yandex.by/map-widget/v1/?ll=27.580419%2C53.902906&mode=search&sctx=ZAAAAAgBEAAaKAoSCXmu78NBjjtAES%2F6CtKM80pAEhIJ%2BWcG8YEd1z8R%2FFBpxMw%2Bvz8iBgABAgMEBSgKOABA%2BJ4GSAFqAnVhnQHNzEw9oAEAqAEAvQEVnmxKwgGNAfvB4ZeLBPbv6OwEpJ6AooAGr433oMoC4MmQnkKNnKmJzQHnqJm15gbPmuObBOvjsaoE0Lbs5gP3zrui5wbQmZLwbuT91sXbBb2IuqfDAZaO7pEx8v7f7aYG54S2goAFxqbxhNwE2dqa%2FKECyPbAtgSKlf3n9QSVmKeI3wWJndi55QSFkpmGBJGtjJObBuoBAPIBAPgBAIICFdGB0LXQutC%2B0L3QtCDRhdC10L3QtIoCCTE4NDEwNzk1OZICAJoCDGRlc2t0b3AtbWFwc6oCPDIwNDU3OTQwODgxMiw3NzI5MjExMzI1Miw0NTMxNzMwMjk0LDI0NTAzOTE2NTAxNCwxOTQzMzMzNzc2Ng%3D%3D&sll=27.580419%2C53.902906&sspn=0.190885%2C0.064505&text=%D1%81%D0%B5%D0%BA%D0%BE%D0%BD%D0%B4%20%D1%85%D0%B5%D0%BD%D0%B4&z=12.92" width="560" height="400" frameborder="1" allowfullscreen="true" style="position:relative;"></iframe>
+          </div>
+      </td>
+      <td class="rightcol">
+          <div class="text">
+            {% for inf in object_list %}
+                <h3><a href="{{ inf.get_urls }}">{{ inf.name_store }} {{ inf.name_rating }}</a></h3>
+                <p>{{ inf.city }}, ул. {{ inf.street }}, {{ inf.house }}</p>
+                <hr>
+            {% endfor %}
+          </div>
+      </td>
+  </tr>
+</table>
+    <!--<h1>Карта города с метками магазинов</h1>
+    <div>
+        {% for second in second_hands %}
+            {{ second }}
+        {% endfor %}
+    </div>
+    <div style="position:relative;overflow:hidden;">
+        <a href="https://yandex.by/maps/157/minsk/search/%D1%81%D0%B5%D0%BA%D0%BE%D0%BD%D0%B4%20%D1%85%D0%B5%D0%BD%D0%B4/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:0px;">секонд хенд в Минске</a>
+        <a href="https://yandex.by/maps/157/minsk/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:14px;">Минск</a><iframe src="https://yandex.by/map-widget/v1/?ll=27.580419%2C53.902906&mode=search&sctx=ZAAAAAgBEAAaKAoSCXmu78NBjjtAES%2F6CtKM80pAEhIJ%2BWcG8YEd1z8R%2FFBpxMw%2Bvz8iBgABAgMEBSgKOABA%2BJ4GSAFqAnVhnQHNzEw9oAEAqAEAvQEVnmxKwgGNAfvB4ZeLBPbv6OwEpJ6AooAGr433oMoC4MmQnkKNnKmJzQHnqJm15gbPmuObBOvjsaoE0Lbs5gP3zrui5wbQmZLwbuT91sXbBb2IuqfDAZaO7pEx8v7f7aYG54S2goAFxqbxhNwE2dqa%2FKECyPbAtgSKlf3n9QSVmKeI3wWJndi55QSFkpmGBJGtjJObBuoBAPIBAPgBAIICFdGB0LXQutC%2B0L3QtCDRhdC10L3QtIoCCTE4NDEwNzk1OZICAJoCDGRlc2t0b3AtbWFwc6oCPDIwNDU3OTQwODgxMiw3NzI5MjExMzI1Miw0NTMxNzMwMjk0LDI0NTAzOTE2NTAxNCwxOTQzMzMzNzc2Ng%3D%3D&sll=27.580419%2C53.902906&sspn=0.190885%2C0.064505&text=%D1%81%D0%B5%D0%BA%D0%BE%D0%BD%D0%B4%20%D1%85%D0%B5%D0%BD%D0%B4&z=12.92" width="560" height="400" frameborder="1" allowfullscreen="true" style="position:relative;"></iframe>
+    </div>
+    <div style="position:relative;overflow:hidden;">
+        <a href="https://yandex.by/maps/157/minsk/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:0px;">Минск</a>
+        <a href="https://yandex.by/maps/157/minsk/house/Zk4YcAdgTkEBQFtpfXVxdXtkYw==/?ll=27.601183%2C53.903964&utm_medium=mapframe&utm_source=maps&z=17.25" style="color:#eee;font-size:12px;position:absolute;top:14px;">1-й Твёрдый переулок, 2 — Яндекс Карты</a><iframe src="https://yandex.by/map-widget/v1/?ll=27.601183%2C53.903964&mode=whatshere&whatshere%5Bpoint%5D=27.600834%2C53.904855&whatshere%5Bzoom%5D=17&z=17.25" width="700" height="550"  frameborder="1" allowfullscreen="false" style="position:relative;"></iframe>
+        </div>-->
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'main/base.html' %}
+
+{% block title %}
+Главная
+{% endblock %}
+
+{% block content %}
+
+    {% for inf in object_list %}
+        <h3><a href="{{ inf.get_urls }}">{{ inf.name_store }} {{ inf.name_rating }}</a></h3>
+        <p>{{ inf.city }}, ул. {{ inf.street }}, {{ inf.house }}</p>
+        <p>{{ inf.open_hours.monday }}</p>
+        <p>{{ week }}</p>
+        <hr>
+    {% endfor %}
+
+{% endblock %}

@@ -6,11 +6,10 @@
 
 {% block content %}
 
-    {% for inf in object_list %}
-        <h3><a href="{{ inf.get_urls }}">{{ inf.name_store }} {{ inf.name_rating }}</a></h3>
+    {% for inf in list_shop_presentation %}
+        <h3><a href="{% url 'store' inf.id %}">{{ inf.name_store }} {{ inf.name_rating }}</a></h3>
         <p>{{ inf.city }}, ул. {{ inf.street }}, {{ inf.house }}</p>
-        <p>{{ inf.open_hours.monday }}</p>
-        <p>{{ week }}</p>
+        <p>{{ inf.opening_hours_today }}</p>
         <hr>
     {% endfor %}
 

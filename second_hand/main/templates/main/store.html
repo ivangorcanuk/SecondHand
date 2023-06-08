@@ -11,9 +11,9 @@
           <div style="text-center w-100">
               <h3>{{ store.name_store }} {{ store.name_rating }}</h3>
               <p>{{ store.city }}, ул. {{ store.street }}, {{ store.house }}</p>
-              <p>{% if week_number == store.open_hours.week_number %}
-                  {{ store.open_hours.monday }}
-                  {% endif %}</p>
+              {% for inf in store.prob %}
+                    <p>{{ inf }}</p>
+              {% endfor %}
               <hr>
           </div>
       </td>

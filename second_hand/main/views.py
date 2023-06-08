@@ -6,6 +6,7 @@
 # DeleteView удалить запись
 from django.shortcuts import render
 from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours
+from .shop_introduction import Store
 from django.views.generic import ListView
 from datetime import datetime
 
@@ -17,29 +18,15 @@ class Index(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(Index, self).get_context_data(**kwargs)
-        week = self.week()
-        print(week)
-        #print(self.model.open_hours)
-        context['week'] = week
+        list_shop_presentation = list()  # список представления магазинов
+        base_shop = Stores.objects.all()
+        for store in base_shop:  # прошлись по таблице с магазинами и отправили данные в класс представления
+            st = Store(store.id, store.name_store, store.country, store.city, store.area, store.street, store.house, store.floor,
+                 store.number_phone, store.number_stars, store.rating, store.store_network, store.open_hours)
+            list_shop_presentation.append(st)
+            wek = store.city
+        context['list_shop_presentation'] = list_shop_presentation
         return context
-
-    def week(self):
-        cur = datetime.now()
-        day_week = datetime.isoweekday(cur)
-        if day_week == 1:
-            return 'monday'
-        elif day_week == 2:
-            return 'tuesday'
-        elif day_week == 3:
-            return 'wednesday'
-        elif day_week == 4:
-            return 'thursday'
-        elif day_week == 5:
-            return 'friday'
-        elif day_week == 6:
-            return 'saturday'
-        elif day_week == 7:
-            return 'sunday'
 
 
 class Map(ListView):
@@ -62,8 +49,10 @@ class Map(ListView):
 
 
 def stor(request, id_store: int):
-    stor = Stores.objects.get(id=id_store)
-    week = OpenHours.objects.get(id=str(stor.open_hours))
+    id_store = Stores.objects.get(id=id_store)
+    store = Store(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.area, id_store.street,
+                  id_store.house, id_store.floor, id_store.number_phone, id_store.number_stars, id_store.rating,
+                  id_store.store_network, id_store.open_hours)
     import datetime
     week_number = datetime.datetime.today().isocalendar()[1]  # получили № недели
     # print(stor.open_hours.week_number)
@@ -73,7 +62,7 @@ def stor(request, id_store: int):
     #         list_days_week.append(day)
     # print(list_days_week)
     data = {
-        'store': stor,
+        'store': store,
         'week_number': week_number
     }
     return render(request, 'main/store.html', context=data)

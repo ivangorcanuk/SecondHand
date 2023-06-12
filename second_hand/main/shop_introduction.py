@@ -3,13 +3,13 @@ from datetime import datetime, date
 
 
 class Store:
-    weekdays = {'1': 'Пн',
-                '2': 'Вт',
-                '3': 'Ср',
-                '4': 'Чт',
-                '5': 'Пт',
-                '6': 'Сб',
-                '7': 'Вс'}
+    dict_weekdays = {0: 'Пн',
+                     1: 'Вт',
+                     2: 'Ср',
+                     3: 'Чт',
+                     4: 'Пт',
+                     5: 'Сб',
+                     6: 'Вс'}
 
     def __init__(self, id_store, name_store, country, city, area, street, house, floor,
                  number_phone, number_stars, rating, store_network, open_hours):
@@ -25,61 +25,44 @@ class Store:
         self.number_stars = number_stars
         self.rating = rating
         self.store_network = store_network
-        self.id_open_hours = open_hours
-        self.opening_hours_today = self.col()  # готовая строка для отображения рабочего времени
-        self.prob = self.cikl()
-        #self.list_week_day = self.col()
+        self.list_open_hours = [open_hours.monday, open_hours.tuesday, open_hours.wednesday,
+                                open_hours.thursday, open_hours.friday, open_hours.saturday,
+                                open_hours.sunday]
+        self.opening_hours_today_text = self.get_day_of_week()  # готовая строка для отображения рабочего времени
+        self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
 
-    def col(self):
-        day_week = datetime.weekday(datetime.now())  # вытянули намер дня недели (0,1..)
-        # date_current = str(date.today())  # получили сегодняшнюю дату
-        # date_current = date_current.replace('-', '.')  # заменяет черточки на точки
-        # date_current = str(day_week) + ', ' + date_current  # сформировали строку
-        # full_date = datetime.strptime(date_current, "%w, %d.%m.%Y").strftime("%A, %d %B %Y")
-        # week_day = full_date[:full_date.find(',')].lower()  # получили день недели
-        dict_week = self.week()
-        for i in range(len(dict_week)):
-            if dict_week[list(dict_week.keys())[i]][2] == day_week + 1:
-                day = dict_week[list(dict_week.keys())[i]][1]
-                return day[:2] + ':00 - ' + day[2:] + ':00'
+    def get_day_of_week(self, p_week_day=-1):
+        week_day = p_week_day
+        if p_week_day == -1:
+            week_day = datetime.weekday(datetime.now())  # вытянули намер дня недели (0,1..)
+        work_time_value = self.list_open_hours[week_day]
+        return work_time_value[:2] + ':00 - ' + work_time_value[2:] + ':00'
 
-    def cikl(self):
-        dict_week = self.week()
-        is_o = True
-        b = int()
-        list_ap = list()
+    def prepare_week_schedule(self):
+        is_new_sequence = True  # это новая последовательность? (да/нет)
+        first_day = int()
+        list_days_open_hours = list()
         for i in range(6):
-            if dict_week[list(dict_week.keys())[i]][1] == dict_week[list(dict_week.keys())[i + 1]][1]:
-                if is_o:
-                    b = i
-                is_o = False
+            if self.list_open_hours[i] == self.list_open_hours[i+1]:
+                if is_new_sequence:
+                    first_day = i
+                is_new_sequence = False
             else:
-                time = dict_week[list(dict_week.keys())[b]][1]
+                time = self.list_open_hours[i]
                 time = time[:2] + ':00 - ' + time[2:] + ':00'
-                forma = dict_week[list(dict_week.keys())[b]][0] + '-' + dict_week[list(dict_week.keys())[i]][0] + ': ' + time
-                is_o = True
-                list_ap.append(forma)
-            if len(dict_week) == i + 2:
-                time = dict_week[list(dict_week.keys())[b]][1]
+                forma = self.dict_weekdays[first_day] + '-' + self.dict_weekdays[i] + ': ' + time
+                is_new_sequence = True
+                list_days_open_hours.append(forma)
+            if len(self.list_open_hours) == i + 2:
+                time = self.list_open_hours[i]
                 time = time[:2] + ':00 - ' + time[2:] + ':00'
-                forma = dict_week[list(dict_week.keys())[b]][0] + '-' + dict_week[list(dict_week.keys())[i]][0] + ': ' + time
-                list_ap.append(forma)
+                forma = self.dict_weekdays[first_day] + '-' + self.dict_weekdays[i] + ': ' + time
+                list_days_open_hours.append(forma)
                 break
-        return list_ap
+        return list_days_open_hours
 
-    def week(self):
-        monday = self.id_open_hours.monday
-        tuesday = self.id_open_hours.tuesday
-        wednesday = self.id_open_hours.wednesday
-        thursday = self.id_open_hours.thursday
-        friday = self.id_open_hours.friday
-        saturday = self.id_open_hours.saturday
-        sunday = self.id_open_hours.sunday
-        return {'monday': ['Пн', monday, 1],
-                'tuesday': ['Вт', tuesday, 2],
-                'wednesday': ['Ср', wednesday, 3],
-                'thursday': ['Чт', thursday, 4],
-                'friday': ['Пт', friday, 5],
-                'saturday': ['Сб', saturday, 6],
-                'sunday': ['Вс', sunday, 7]}
+# пн-вт  10:00-20:00
+# ср-чт  10:00-20:00
+# пт-сб  10:00-20:00
+# вс     10:00-20:00
 

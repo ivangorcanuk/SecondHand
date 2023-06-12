@@ -11,7 +11,7 @@
           <div style="text-center w-100">
               <h3>{{ store.name_store }} {{ store.name_rating }}</h3>
               <p>{{ store.city }}, ул. {{ store.street }}, {{ store.house }}</p>
-              {% for inf in store.prob %}
+              {% for inf in store.list_days_open_hours %}
                     <p>{{ inf }}</p>
               {% endfor %}
               <hr>

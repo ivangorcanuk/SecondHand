@@ -24,7 +24,6 @@ class Index(ListView):
             st = Store(store.id, store.name_store, store.country, store.city, store.area, store.street, store.house, store.floor,
                  store.number_phone, store.number_stars, store.rating, store.store_network, store.open_hours)
             list_shop_presentation.append(st)
-            wek = store.city
         context['list_shop_presentation'] = list_shop_presentation
         return context
 

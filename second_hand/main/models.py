@@ -37,6 +37,26 @@ class OpenHours(models.Model):  # рабочее время
         return f'{self.id}'
 
 
+class PromotionsRegister(models.Model):  # все возможные акции и их процентное соотношение
+    promotion_name = models.CharField(max_length=50)
+    value = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.promotion_name}'
+
+
+class PromotionDays(models.Model):  # дни акций
+    week_number = models.IntegerField()  # номер недели
+    promotion_days = models.ManyToManyField(PromotionsRegister)  # id скидок
+    # monday = models.CharField(max_length=50)
+    # tuesday = models.CharField(max_length=50)
+    # wednesday = models.CharField(max_length=50)
+    # thursday = models.CharField(max_length=50)
+    # friday = models.CharField(max_length=50)
+    # saturday = models.CharField(max_length=50)
+    # sunday = models.CharField(max_length=50)
+
+
 class Stores(models.Model):  # магазины
     name_store = models.CharField(max_length=50)  # имя магазина
     country = models.CharField(max_length=50, blank=True)  # страна
@@ -50,6 +70,7 @@ class Stores(models.Model):  # магазины
     rating = models.FloatField(null=True, blank=True)
     store_network = models.ForeignKey(StoreNetwork, on_delete=models.CASCADE, null=True)  # id сети магазинов которой он принадлежит
     open_hours = models.ForeignKey(OpenHours, on_delete=models.CASCADE, null=True)  # id времени работы
+    promotion_days = models.ForeignKey(PromotionDays, on_delete=models.CASCADE, null=True)  # id скидок
     #slug = models.SlugField(default='', null=False)
 
     def __str__(self):
@@ -61,23 +82,6 @@ class Stores(models.Model):  # магазины
     # def save(self, *args, **kwargs):
     #     self.slug = slugify(self.name_store)
     #     super().save(*args, **kwargs)
-
-
-class PromotionDays(models.Model):  # дни акций
-    store = models.ForeignKey(Stores, on_delete=models.CASCADE, null=True)  # id магазина
-    week_number = models.IntegerField()  # номер недели
-    monday = models.IntegerField()
-    tuesday = models.IntegerField()
-    wednesday = models.IntegerField()
-    thursday = models.IntegerField()
-    friday = models.IntegerField()
-    saturday = models.IntegerField()
-    sunday = models.IntegerField()
-
-
-class PromotionsRegister(models.Model):  # все возможные акции и их процентное соотношение
-    promotion_name = models.CharField(max_length=50)
-    value = models.IntegerField()
 
 
 # class Reviews(models.Model):  # отзывы

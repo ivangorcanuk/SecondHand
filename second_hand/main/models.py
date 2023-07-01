@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from pytils.translit import slugify
+import datetime
 
 
 class StoreNetwork(models.Model):  # сети магазинов
@@ -24,14 +25,20 @@ class LinkSocNetworks(models.Model):  # ссылки на соц сети и о�
 
 
 class OpenHours(models.Model):  # рабочее время
-    week_number = models.IntegerField()  # номер недели
-    monday = models.CharField(max_length=20)
-    tuesday = models.CharField(max_length=20)
-    wednesday = models.CharField(max_length=20)
-    thursday = models.CharField(max_length=20)
-    friday = models.CharField(max_length=20)
-    saturday = models.CharField(max_length=20)
-    sunday = models.CharField(max_length=20)
+    mon_st = models.DateTimeField()
+    mon_fn = models.DateTimeField()
+    tue_st = models.DateTimeField()
+    tue_fn = models.DateTimeField()
+    wed_st = models.DateTimeField()
+    wed_fn = models.DateTimeField()
+    thu_st = models.DateTimeField()
+    thu_fn = models.DateTimeField()
+    fri_st = models.DateTimeField()
+    fri_fn = models.DateTimeField()
+    sat_st = models.DateTimeField()
+    sat_fn = models.DateTimeField()
+    sun_st = models.DateTimeField()
+    sun_fn = models.DateTimeField()
 
     def __str__(self):
         return f'{self.id}'

@@ -25,20 +25,26 @@ class Store:
         self.number_stars = number_stars
         self.rating = rating
         self.store_network = store_network
-        self.list_open_hours = [open_hours.monday, open_hours.tuesday, open_hours.wednesday,
-                                open_hours.thursday, open_hours.friday, open_hours.saturday,
-                                open_hours.sunday]
+        self.list_open_hours = [open_hours.mon_st, open_hours.mon_fn,
+                                open_hours.tue_st, open_hours.tue_fn,
+                                open_hours.wed_st, open_hours.wed_fn,
+                                open_hours.thu_st, open_hours.thu_fn,
+                                open_hours.fri_st, open_hours.fri_fn,
+                                open_hours.sat_st, open_hours.sat_fn,
+                                open_hours.sun_st, open_hours.sun_fn]
         self.list_promotion_days = list_promotion_days
         self.opening_hours_today_text = self.get_day_of_week()  # готовая строка для отображения рабочего времени
         self.discount_today = list_promotion_days[datetime.weekday(datetime.now())]
-        self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
+        #self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
 
-    def get_day_of_week(self, p_week_day=-1):
-        week_day = p_week_day
-        if p_week_day == -1:
-            week_day = datetime.weekday(datetime.now())  # вытянули намер дня недели (0,1..)
-        work_time_value = self.list_open_hours[week_day]
-        return work_time_value[:2] + ':00 - ' + work_time_value[2:] + ':00'
+    def get_day_of_week(self):
+        for i in range(len(self.list_open_hours)):
+            if date.today() == self.list_open_hours[0].date():
+                start_time = self.list_open_hours[i].time().replace(second=0)
+                finish_time = self.list_open_hours[i+1].time().replace(second=0)
+                start_str = datetime.strptime(str(start_time), "%H:%M:%S").strftime("%H:%M")
+                finish_str = datetime.strptime(str(finish_time), "%H:%M:%S").strftime("%H:%M")
+                return start_str + ' - ' + finish_str
 
     def get_time_str(self, time, first_day=str(), second_day=str()):
         time = time[:2] + ':00 - ' + time[2:] + ':00'

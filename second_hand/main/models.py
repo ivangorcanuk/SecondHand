@@ -53,25 +53,20 @@ class PromotionsRegister(models.Model):  # все возможные акции 
 
 
 class PromotionDays(models.Model):  # дни акций
-    week_number = models.IntegerField()  # номер недели
-    promotion_days = models.ManyToManyField(PromotionsRegister)  # id скидок
-    # monday = models.CharField(max_length=50)
-    # tuesday = models.CharField(max_length=50)
-    # wednesday = models.CharField(max_length=50)
-    # thursday = models.CharField(max_length=50)
-    # friday = models.CharField(max_length=50)
-    # saturday = models.CharField(max_length=50)
-    # sunday = models.CharField(max_length=50)
+    monday = models.CharField(max_length=50, blank=True)
+    tuesday = models.CharField(max_length=50, blank=True)
+    wednesday = models.CharField(max_length=50, blank=True)
+    thursday = models.CharField(max_length=50, blank=True)
+    friday = models.CharField(max_length=50, blank=True)
+    saturday = models.CharField(max_length=50, blank=True)
+    sunday = models.CharField(max_length=50, blank=True)
 
 
 class Stores(models.Model):  # магазины
     name_store = models.CharField(max_length=50)  # имя магазина
     country = models.CharField(max_length=50, blank=True)  # страна
     city = models.CharField(max_length=50)  # город
-    area = models.CharField(max_length=50)  # район
-    street = models.CharField(max_length=50, blank=True)  # улица
-    house = models.CharField(max_length=50, blank=True)  # дом
-    floor = models.CharField(max_length=50, blank=True)  # этаж
+    address = models.CharField(max_length=50)  # адрес
     number_phone = models.IntegerField()  # номер телефона магазина
     number_stars = models.IntegerField(null=True, blank=True)  # количество звезд оставленных подьзователями
     rating = models.FloatField(null=True, blank=True)
@@ -81,7 +76,7 @@ class Stores(models.Model):  # магазины
     #slug = models.SlugField(default='', null=False)
 
     def __str__(self):
-        return f'{self.name_store} - {self.street}'
+        return f'{self.name_store}'
 
     def get_urls(self):
         return reverse('store', args=[self.id])

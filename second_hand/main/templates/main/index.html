@@ -8,8 +8,9 @@
 
     {% for inf in list_shop_presentation %}
         <h3><a href="{% url 'store' inf.id %}">{{ inf.name_store }} {{ inf.name_rating }}</a></h3>
-        <p>{{ inf.city }}, ул. {{ inf.street }}, {{ inf.house }}</p>
+        <p>{{ inf.city }}, {{ inf.address }}</p>
         <p>{{ inf.opening_hours_today_text }}</p>
+        <p>{{ inf.discount_today.promotion_name }}</p>
         <hr>
     {% endfor %}
 

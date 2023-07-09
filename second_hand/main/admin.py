@@ -22,34 +22,37 @@ class LinkSocNetworks(admin.ModelAdmin):
 
 @admin.register(Stores)
 class Stores(admin.ModelAdmin):
-    list_display = ['name_store', 'country', 'city', 'area', 'street',
-                    'house', 'store_network_id', 'open_hours']
+    list_display = ['name_store', 'country', 'city', 'address', 'store_network_id', 'open_hours']
     #list_editable = ['area', 'rating']  # список изменения полей
 
     def __str__(self):
-        return f'{self.name_store} - {self.city} - {self.area} - {self.street_house} - {self.number_phone}'
+        return f'{self.name_store} - {self.city} - {self.address} - {self.number_phone}'
 
 
 @admin.register(OpenHours)
 class OpenHours(admin.ModelAdmin):
-    list_display = ['week_number', 'monday', 'tuesday', 'wednesday',
-                    'thursday', 'friday', 'saturday', 'sunday']
+    list_display = ['mon_st', 'mon_fn',
+                    'tue_st', 'tue_fn',
+                    'wed_st', 'wed_fn',
+                    'thu_st', 'thu_fn',
+                    'fri_st', 'fri_fn',
+                    'sat_st', 'sat_fn',
+                    'sun_st', 'sun_fn']
     #list_editable = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']  # список изменения полей
 
-    def __str__(self):
-        return f'{self.week_number} - {self.monday} - {self.tuesday} - {self.wednesday} - ' \
-               f'{self.thursday} - {self.friday} - {self.saturday} - {self.sunday}'
+    # def __str__(self):
+    #     return f'{self.week_number} - {self.monday} - {self.tuesday} - {self.wednesday} - ' \
+    #            f'{self.thursday} - {self.friday} - {self.saturday} - {self.sunday}'
 
 
 @admin.register(PromotionDays)
 class PromotionDays(admin.ModelAdmin):
-    list_display = ['store', 'week_number', 'monday', 'tuesday', 'wednesday',
-                    'thursday', 'friday', 'saturday', 'sunday']
+    list_display = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+    #filter_horizontal = ['promotion_days']
     #list_editable = ['number_stars', 'rating']  # список изменения полей
 
     def __str__(self):
-        return f'{self.store} - {self.week_number} - {self.monday} - {self.tuesday} - {self.wednesday} - ' \
-               f'{self.thursday} - {self.friday} - {self.saturday} - {self.sunday}'
+        return f'{self.week_number}'
 
 
 @admin.register(PromotionsRegister)

@@ -1,5 +1,11 @@
 {% extends 'main/base.html' %}
 
+{% load static %} <!-- добавили новую функциональность, теги css -->
+
+{% block css_additional %}
+    <link rel="stylesheet" href="{% static 'main/css/store.css' %}"> <!-- rel указывает тип документа, который хотим подгрузить, "stylesheet" - css -->
+{% endblock %}
+
 {% block title %}
 Магазин
 {% endblock %}
@@ -10,11 +16,18 @@
       <td>
           <div style="text-center w-100">
               <h3>{{ store.name_store }} {{ store.name_rating }}</h3>
-              <p>{{ store.city }}, ул. {{ store.street }}, {{ store.house }}</p>
+              <p>{{ store.city }}, {{ store.address }}</p>
               {% for inf in store.list_days_open_hours %}
                     <p>{{ inf }}</p>
               {% endfor %}
               <hr>
+          </div>
+          <div>
+              <ul class="hr">
+              {% for inf in store.list_promotion_days %}
+              <li>{{ inf.promotion_name }}</li>
+              {% endfor %}
+              </ul>
           </div>
       </td>
       <td class="rightcol">

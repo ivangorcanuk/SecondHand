@@ -22,7 +22,7 @@ class LinkSocNetworks(admin.ModelAdmin):
 
 @admin.register(Stores)
 class Stores(admin.ModelAdmin):
-    list_display = ['name_store', 'country', 'city', 'address', 'store_network_id', 'open_hours']
+    list_display = ['name_store', 'country', 'city', 'address', 'store_network_id', 'open_hours', 'promotion_days']
     #list_editable = ['area', 'rating']  # список изменения полей
 
     def __str__(self):

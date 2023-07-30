@@ -1,36 +1,20 @@
-from parsers import ModaMaxParser
+from .parsers import ModaMaxParser
 import re
 from datetime import datetime, date, timedelta
 
 
-class Data:
-    def get_dict(self):
-        list_shops = list()
-        modamax_data = ModaMaxParser().dict_shop_data
-        for key, value in modamax_data.items():
-            schedule = value[-1].text
-            many_descaunt = value[:-1]
-            shop = Shop(key, schedule, many_descaunt)
-            list_shops.append(shop)
-        # modamax_data = ModaMaxParser().dict_shop_data
-        # economcity_data = ModaMaxParser().dict_shop_data
-        # adzenne_data = ModaMaxParser().dict_shop_data
-        # megahand_data = ModaMaxParser().dict_shop_data
-        # list_shops_data = [modamax_data, economcity_data, adzenne_data, megahand_data]
-        # for dIct in list_shops_data:
-        #     for key, value in dIct.items():
-        #         schedule = value[-1].text
-        #         many_descaunt = value[:-1]
-        #         shop = Shop(key, schedule, many_descaunt)
-        #         list_shops.append(shop)
-        return list_shops
+class ModaMaxParserDataProcessor:
+    def __init__(self):
+        self.__list_shops = list()
+        self.__modamax_data = dict()
 
-
-class Shop:
-    def __init__(self, address, schedule, many_descaunt):
-            self.address = address
-            self.dict_schedule = self.get_schedule(schedule)
-            self.dict_many = self.get_descaunt(many_descaunt)
+    def get_parsing_results(self):
+        self.__modamax_data = ModaMaxParser().dict_shop_data
+        for key, value in self.__modamax_data.items():
+            dict_schedule = self.get_schedule(value[-1].text)
+            dict_many = self.get_descaunt(value[:-1])
+            self.__list_shops.append(ShopsData(key, dict_schedule, dict_many))
+        return self.__list_shops
 
     def get_descaunt(self, many_descaunt):
         dict_ = dict()
@@ -77,3 +61,19 @@ class Shop:
             i += 1
 
         return dict_week
+
+
+class ShopsData:
+    def __init__(self, address, schedule, many_descaunt):
+        self.address = address
+        self.dict_schedule = schedule
+        self.dict_discounts = many_descaunt
+
+# a = ShopsDataController()
+# m = ModaMaxParserDataProcessor()
+# list_ModaMax = m.list_shops
+# for shop in list_ModaMax:
+#     for key, value in shop.dict_discounts.items():
+#         print(key, value)
+#     for key, value in shop.dict_schedule.items():
+#         print(key, value)

@@ -61,6 +61,9 @@ class PromotionDays(models.Model):  # дни акций
     saturday = models.CharField(max_length=50, blank=True)
     sunday = models.CharField(max_length=50, blank=True)
 
+    def __str__(self):
+        return f'{self.id}'
+
 
 class Stores(models.Model):  # магазины
     name_store = models.CharField(max_length=50)  # имя магазина
@@ -70,9 +73,9 @@ class Stores(models.Model):  # магазины
     number_phone = models.IntegerField()  # номер телефона магазина
     number_stars = models.IntegerField(null=True, blank=True)  # количество звезд оставленных подьзователями
     rating = models.FloatField(null=True, blank=True)
-    store_network = models.ForeignKey(StoreNetwork, on_delete=models.CASCADE, null=True)  # id сети магазинов которой он принадлежит
-    open_hours = models.ForeignKey(OpenHours, on_delete=models.CASCADE, null=True)  # id времени работы
-    promotion_days = models.ForeignKey(PromotionDays, on_delete=models.CASCADE, null=True)  # id скидок
+    store_network = models.ForeignKey(StoreNetwork, on_delete=models.CASCADE, null=True, blank=True)  # id сети магазинов которой он принадлежит
+    open_hours = models.ForeignKey(OpenHours, on_delete=models.CASCADE, null=True, blank=True)  # id времени работы
+    promotion_days = models.ForeignKey(PromotionDays, on_delete=models.CASCADE, null=True, blank=True)  # id скидок
     #slug = models.SlugField(default='', null=False)
 
     def __str__(self):

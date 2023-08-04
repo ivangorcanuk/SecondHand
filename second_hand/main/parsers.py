@@ -29,26 +29,28 @@ class ModaMaxParser:
         link_shops = soup_1.find_all(class_="shopCard")
         dict_shop = dict()  # словарь для хранения магазинов, ключ - адрес, значение - ссылка
         for i in link_shops:
-            street_house = re.search(r',\s*(\D+\d+)', i.text)  # SOS
+            street_house = re.search(r'Минск, (.+)  \n', i.text)  # SOS
+            #print(f'Тута \"{street_house.group(1)}\"')
             dict_shop[street_house.group(1)] = 'https://modamax.by/' + i.get('href')
         return dict_shop
 
     def get_data(self, dikt_url_minsk_shops):
-        symbols = [', ', ' ']
+        #symbols = [', ', ' ']
         count = 0
         dict_shop_data = dict()
         for key, value in dikt_url_minsk_shops.items():
-            if count == 0:
-                for i in symbols:
-                    if i in key:
-                        key = key.replace(i, '_')
-                req_2 = requests.get(value, headers=self.headers)
-                soup_2 = BS(req_2.content, 'lxml')
-                open_hours = soup_2.find(class_='shopInfo__row-content')
-                title = soup_2.find_all(class_='shopPrice__cell')
-                title.append(open_hours)
-                dict_shop_data[key] = title
-                count += 1
+            #if count < 2:
+            # for i in symbols:
+            #     if i in key:
+            #         key = key.replace(i, '_')
+            req_2 = requests.get(value, headers=self.headers)
+            soup_2 = BS(req_2.content, 'lxml')
+            open_hours = soup_2.find(class_='shopInfo__row-content')
+            title = soup_2.find_all(class_='shopPrice__cell')
+            title.append(open_hours)
+            dict_shop_data[key] = title
+            #print(key)
+            count += 1
         return dict_shop_data
 
 

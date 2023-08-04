@@ -23,7 +23,7 @@ class LinkSocNetworks(admin.ModelAdmin):
 @admin.register(Stores)
 class Stores(admin.ModelAdmin):
     list_display = ['name_store', 'country', 'city', 'address', 'store_network_id', 'open_hours', 'promotion_days']
-    #list_editable = ['area', 'rating']  # список изменения полей
+    #list_editable = ['store_network_id', 'open_hours', 'promotion_days']  # список изменения полей
 
     def __str__(self):
         return f'{self.name_store} - {self.city} - {self.address} - {self.number_phone}'
@@ -31,7 +31,8 @@ class Stores(admin.ModelAdmin):
 
 @admin.register(OpenHours)
 class OpenHours(admin.ModelAdmin):
-    list_display = ['mon_st', 'mon_fn',
+    list_display = ['id',
+                    'mon_st', 'mon_fn',
                     'tue_st', 'tue_fn',
                     'wed_st', 'wed_fn',
                     'thu_st', 'thu_fn',
@@ -47,7 +48,7 @@ class OpenHours(admin.ModelAdmin):
 
 @admin.register(PromotionDays)
 class PromotionDays(admin.ModelAdmin):
-    list_display = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+    list_display = ['id', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
     #filter_horizontal = ['promotion_days']
     #list_editable = ['number_stars', 'rating']  # список изменения полей
 

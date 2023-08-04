@@ -1,4 +1,4 @@
-from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours
+from .models import PromotionsRegister, StoreNetwork, Stores, LinkSocNetworks, OpenHours
 from datetime import datetime, date
 
 
@@ -12,7 +12,7 @@ class Store:
                      6: 'Вс'}
 
     def __init__(self, id_store, name_store, country, city, address, number_phone,
-                 number_stars, rating, store_network, open_hours):
+                 number_stars, rating, store_network, open_hours, promotion_days):
         self.id = id_store
         self.name_store = name_store
         self.country = country
@@ -30,11 +30,19 @@ class Store:
                         (open_hours.fri_st, open_hours.fri_fn),
                         (open_hours.sat_st, open_hours.sat_fn),
                         (open_hours.sun_st, open_hours.sun_fn)
-        ]
-        #self.list_promotion_days = list_promotion_days
+                               ]
+        self.list_promotion = [
+                        promotion_days.monday,
+                        promotion_days.tuesday,
+                        promotion_days.wednesday,
+                        promotion_days.thursday,
+                        promotion_days.friday,
+                        promotion_days.saturday,
+                        promotion_days.sunday
+                               ]
         self.opening_hours_today_text = self.get_todays_open_hours()  # готовая строка для отображения рабочего времени
-        #self.discount_today = list_promotion_days[datetime.weekday(datetime.now())]
         self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
+        self.list_promotion_days = self.get_list_promotion_days()
 
     def get_todays_open_hours(self):
         for day in self.list_open_hours:
@@ -80,3 +88,13 @@ class Store:
             list_days_open_hours.append(self.get_time_str(self.list_open_hours[-1], self.dict_weekdays[first_day], self.dict_weekdays[6]))
         return list_days_open_hours
 
+    def get_list_promotion_days(self):
+        lisT = list()
+        for element in self.list_promotion:  # проходим по списку с id скидок
+            list_id_promotion = element.split('*')  # разбили склеиный элемент и поместили в отдельный список
+            list_promotion = list()
+            for j in list_id_promotion:
+                promotion = PromotionsRegister.objects.get(id=int(j))
+                list_promotion.append(promotion.promotion_name)
+            lisT.append(tuple(list_promotion))
+        return lisT

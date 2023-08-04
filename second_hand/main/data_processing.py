@@ -14,6 +14,8 @@ class ModaMaxParserDataProcessor:
             dict_schedule = self.get_schedule(value[-1].text)
             dict_many = self.get_descaunt(value[:-1])
             self.__list_shops.append(ShopsData(key, dict_schedule, dict_many))
+        # for value in self.__list_shops:
+        #     print(value.address)
         return self.__list_shops
 
     def get_descaunt(self, many_descaunt):

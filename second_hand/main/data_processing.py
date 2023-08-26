@@ -122,12 +122,26 @@ class EconomCityParserDataProcessor:
             'Сб': [],
             'Вс': [],
         }
-        without_enter_schedule = schedule_raw.replace('\n', '')
-        converted_timetable = re.search(r'(.+)В день полной', without_enter_schedule)
-        converted_timetable = converted_timetable.group(1).replace('.', ':')
-        self.__exception_full_change = re.search(r'В день полной\D*(\d*.\d*\s*.\s*\d*.\d*)', without_enter_schedule)
-        if re.search(r'В день акции', without_enter_schedule):
-            self.__exception_all_by_3 = re.search(r'В день акции.*(\d\d.\d\d\s*.\s*\d\d.\d\d)', without_enter_schedule)
+
+        print(f'<<{schedule_raw}>>')
+        without_enter_schedule = re.search(r'(.*\n*.+)\nВ день полной', schedule_raw)
+        without_enter_schedule = without_enter_schedule.group(1).replace('\r', '')
+        without_enter_schedule = without_enter_schedule.split('\n')
+        without_enter_schedule = without_enter_schedule[0] + without_enter_schedule[1]
+        converted_timetable = str()
+        for i in range(len(without_enter_schedule)):
+            if without_enter_schedule[i] == ' ' and without_enter_schedule[i+1] == ':':
+                continue
+            converted_timetable += without_enter_schedule[i]
+        converted_timetable = converted_timetable.replace('.', ':')
+        print(converted_timetable)
+        temp_time_full_change = re.search(r'В день полной\D*(\d*.\d*\s*.\s*\d*.\d*)', schedule_raw)
+        self.__exception_full_change = temp_time_full_change.group(1)
+        print(self.__exception_full_change)
+
+        if re.search(r'В день акции', schedule_raw):
+            temp_time_all_by_3 = re.search(r'В день акции.*(\d\d.\d\d\s*.\s*\d\d.\d\d)', schedule_raw)
+            self.__exception_all_by_3 = temp_time_all_by_3.group(1)
 
         days = str()
         i = 0
@@ -149,7 +163,7 @@ class EconomCityParserDataProcessor:
         return dict_schedule
 
     def update_special_day(self, dict_schedule, dict_discounts):
-        start_finish = re.search(r'(\S+)\s+.\s+(\S+)', self.__exception_full_change.group(1))
+        start_finish = re.search(r'(\S+)\s+.\s+(\S+)', self.__exception_full_change)
         i = 0  # счетчик дней, до 'Полной смены товара'
         for key, value in dict_discounts.items():
             for j in value:

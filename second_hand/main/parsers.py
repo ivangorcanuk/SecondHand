@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup as BS
 import re
+import json
 from datetime import datetime, date, timedelta
 
 
@@ -89,7 +90,7 @@ class EconomCityParser:
         return dict_shop_data
 
 
-class Adzenne:
+class AdzenneParser:
     url = 'https://second-hand.by/kramy/'
     headers = {
         'Accept': 'application/font-woff2;q=1.0,application/font-woff;q=0.9,*/*;q=0.8',
@@ -102,14 +103,18 @@ class Adzenne:
     def __get_url_all_shops_network(self):  # вернули ссылку со всеми магазинами города Минска
         req = requests.get(self.url, headers=self.headers)
         soup = BS(req.content, 'lxml')
-        all_shop = soup.find(class_='wpb_column vc_column_container vc_col-sm-12 vc_hidden-lg')
-        all_shop1 = all_shop.find_all('a')
+        all_shop = soup.find_all(class_='wpb_text_column wpb_content_element')
+        all_shop_link = list()
+        for i in all_shop:
+            if 'Крама' in i.text:
+                a = i.find_all('a')
+                all_shop_link.append(a[1])
+            if 'Салігорск' in i.text:
+                break
         dict_shop = dict()
-        for i in all_shop1:
-            if i.text == '\n':
-                continue
-            dict_shop[i.text] = 'https://second-hand.by/kramy/' + i.get('href')
-            #print(i.text, 'https://second-hand.by/kramy/' + i.get('href'))
+        for i in all_shop_link:
+            dict_shop[i.text] = i.get('href')
+            #print(i.text, i.get('href'))
         return dict_shop
 
     def get_data(self):
@@ -117,18 +122,17 @@ class Adzenne:
         count = 0
         dict_shop_data = dict()
         for key, value in self.__dikt_url_minsk_shops.items():
-            if key != 'вул. С. Ясеніна, 27':
-                req_1 = requests.get(value, headers=self.headers)
-                soup_1 = BS(req_1.content, 'lxml')
-                working_month = soup_1.find('tbody', class_="simcal-month simcal-month-8")
-                list_all_calendar = working_month.find_all("td")
-                all_calendar = soup_1.find('div', class_="wpb_wrapper")
-                work_time = re.search(r'Крама працуе:\n*(.+\n*.*)\n*Прыпынак', all_calendar.text)
-                list_all_calendar.append(work_time.group(1))
-                dict_shop_data[key] = list_all_calendar
-                count += 1
+            #if key == 'Крама па вул. В. Харужай, 8':
+            #if count < 1:
+            req_1 = requests.get(value, headers=self.headers)
+            soup_1 = BS(req_1.content, 'lxml')
+            working_month = soup_1.find('tbody', class_="simcal-month simcal-month-8")
+            list_all_calendar = working_month.find_all("td")
+            all_calendar = soup_1.find('div', class_="wpb_wrapper")
+            work_time = re.search(r'Крама працуе:\n*(.+\n*.*)\n*Прыпынак', all_calendar.text)
+            list_all_calendar.append(work_time.group(1))
+            dict_shop_data[key] = list_all_calendar
+            count += 1
         return dict_shop_data
 
 
-class Megahand:
-    pass

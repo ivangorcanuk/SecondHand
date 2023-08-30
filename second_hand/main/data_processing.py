@@ -68,6 +68,8 @@ class ModaMaxParserDataProcessor:
 
 class EconomCityParserDataProcessor:
     list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+    list_discount = ['День сеньора', '3я вещь в подарок', 'Большое пополнение', '-20%', '-30%', '-40%', '-50%', '-60%',
+                     'Всё по 3 рубля', 'Полна смена товара', 'обувь + текстиль', 'Детский день']
 
     def __init__(self):
         self.__list_shops = list()
@@ -176,22 +178,22 @@ class AdzenneParserDataProcessor:
     list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
     list_week_bel = ['пн', 'аў', 'ср', 'чц', 'пт', 'сб', 'ндз']
     list_streets = [
-        ['Крама па вул. Бурдзейнага, 8', 'ул. Бурдейного, 8'],
-        ['Крама па вул. В. Харужай, 18/1', 'ул. Веры Хоружей, 18/1'],
-        ['Крама па пр. Газеты Праўда, 17', 'пр. Газеты Правда, 17'],
-        ['Крама па вул. Громава, 28', 'ул. Громова, 28'],
-        ['Крама па пр. Жукава, 25/1', 'пр. Жукова, 25/1'],
-        ['Крама па вул. Кіжаватава, 66', 'ул. Лейтенанта Кижеватова, 66'],
-        ['Крама па вул. Матусевіча, 68', 'ул. Матусевича, 68'],
-        ['Крама па вул. Маякоўскага, 16', 'ул. Маяковского, 16'],
-        ['Крама па пр. Незалежнасці, 155/1', 'пр. Независимости, 155/1'],
-        ['Крама па пр. Партызанскiм, 56/2', 'пр. Партизанский, 56/2'],
-        ['Крама па вул. Платонава, 34', 'ул. Платонова, 34'],
-        ['Крама па пр. Ракасоўскага, 150б', 'пр. Рокоссовского, 150б'],
-        ['Крама па вул. Русіянава, 7', 'ул. Руссиянова, 7'],
-        ['Крама па вул. Сярова, 3а', 'ул. Серова, 3а'],
-        ['Крама па вул. Л. Бяды, 39', 'ул. Леонида Беды, 39'],
-        ['Крама па вул. В. Харужай, 8', 'ул. Веры Хоружей, 8']
+        ('Крама па вул. Бурдзейнага, 8', 'ул. Бурдейного, 8'),
+        ('Крама па вул. В. Харужай, 18/1', 'ул. Веры Хоружей, 18/1'),
+        ('Крама па пр. Газеты Праўда, 17', 'пр. Газеты Правда, 17'),
+        ('Крама па вул. Громава, 28', 'ул. Громова, 28'),
+        ('Крама па пр. Жукава, 25/1', 'пр. Жукова, 25/1'),
+        ('Крама па вул. Кіжаватава, 66', 'ул. Лейтенанта Кижеватова, 66'),
+        ('Крама па вул. Матусевіча, 68', 'ул. Матусевича, 68'),
+        ('Крама па вул. Маякоўскага, 16', 'ул. Маяковского, 16'),
+        ('Крама па пр. Незалежнасці, 155/1', 'пр. Независимости, 155/1'),
+        ('Крама па пр. Партызанскiм, 56/2', 'пр. Партизанский, 56/2'),
+        ('Крама па вул. Платонава, 34', 'ул. Платонова, 34'),
+        ('Крама па пр. Ракасоўскага, 150б', 'пр. Рокоссовского, 150б'),
+        ('Крама па вул. Русіянава, 7', 'ул. Руссиянова, 7'),
+        ('Крама па вул. Сярова, 3а', 'ул. Серова, 3а'),
+        ('Крама па вул. Л. Бяды, 39', 'ул. Леонида Беды, 39'),
+        ('Крама па вул. В. Харужай, 8', 'ул. Веры Хоружей, 8')
                     ]
 
     def __init__(self):
@@ -318,6 +320,12 @@ class AdzenneParserDataProcessor:
 
 class MegahandParserDataProcessor:  # MegahandParser
     list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+    list_address = [
+        ('Брикета', 'ул. Брикета, 2'),
+        ('Лобанка', 'ул. Лобанка, 94, ТЦ "Maximus"'),
+        ('Сурганова', 'ул. Сурганова, 57A, ТЦ "Европа"'),
+        ('Дунина-Марцинкевича', 'ул. Дунина-Марцинкевича, 11, ТЦ Раковский Кирмаш')
+                   ]
 
     def __init__(self):
         self.__list_shops = list()
@@ -327,29 +335,45 @@ class MegahandParserDataProcessor:  # MegahandParser
     def get_parsing_results(self):
         self.__megahand_data = MegahandParser().get_data()
         for key, value in self.__megahand_data.items():
+            address = self.get_address(key)
             dict_schedule = self.get_schedule(value[-1].text)
             dict_discounts = self.get_discount(value[:-1])
             if self.__exception_shares_90:
                 dict_schedule = self.update_special_day(dict_schedule, dict_discounts, self.__exception_shares_90)
             self.__list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
-            # print(key)
-            # for key, value in dict_schedule.items():
-            #     print(key, value)
-            # for key, value in dict_discounts.items():
-            #     print(key, value)
+            print(f'<<{address}>>')
+            for key, value in dict_schedule.items():
+                print(key, value)
+            for key, value in dict_discounts.items():
+                print(key, value)
         return self.__list_shops
 
+    def get_address(self, address):
+        for i in self.list_address:
+            if i[0] in address:
+                return i[1]
+
     def get_discount(self, list_discounts):
-        dict_discounts = dict()
+        date_time_obj = None
         day_of_week = date.weekday(date.today())  # хранит сегоднешний день в цифре 0..6
-        # "temp_.." - времен. переменная "cur" - текущая переменная
-        ind = 0
-        for i in range(len(list_discounts)):
-            if 'Cегодня' in list_discounts[i].text:
-                for j in range(i - day_of_week, i - day_of_week + 7):
-                    data_discount = re.search(r'\n(.+)\n+\s*(.*)\n\s*(.*)\n*$', list_discounts[j].text)
-                    dict_discounts[self.list_week[ind]] = [data_discount.group(2), data_discount.group(3)]
-                    ind += 1
+        monday = date.today() - timedelta(day_of_week)  # вернули понедельник
+        is_cur_week = False
+        day_number = 0
+        dict_discounts = dict()
+        for i in list_discounts:
+            for key, value in i.items():
+                if key == 'date':
+                    date_time_obj = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+                if monday == date_time_obj.date() or is_cur_week:
+                    is_cur_week = True
+                    if key == 'class':
+                        dict_discounts[self.list_week[day_number]] = [value]
+                    if key == 'skidka':
+                        dict_discounts[self.list_week[day_number]] += [value]
+            if is_cur_week:
+                day_number += 1
+            if day_number == 7:
+                break
         return dict_discounts
 
     def convert_to_datetime(self, start, finish, day_number):
@@ -362,59 +386,28 @@ class MegahandParserDataProcessor:  # MegahandParser
         return [date_time_start, date_time_finsh]
 
     def get_schedule(self, schedule_raw):
-        dict_schedule = {
-            'Пн': [],
-            'Вт': [],
-            'Ср': [],
-            'Чт': [],
-            'Пт': [],
-            'Сб': [],
-            'Вс': [],
-        }
+        start_finish_time = None
+        if 'Ежедневно' in schedule_raw:
+            start_finish_time = re.search(r'Ежедневно с\s*(\d\d.\d\d).*(\d\d.\d\d)', schedule_raw)
+        if 'В день 90% скидки' in schedule_raw:
+            temp_exception_shares_90 = re.search(r'В день 90% скидки с\s*(\d\d.\d\d.*\d\d.\d\d)', schedule_raw)
+            self.__exception_shares_90 = temp_exception_shares_90.group(1)
 
-        without_enter_schedule = re.search(r'(.*\n*.+)\nВ день полной', schedule_raw)
-        without_enter_schedule = without_enter_schedule.group(1).replace('\r', '')
-        without_enter_schedule = without_enter_schedule.split('\n')
-        without_enter_schedule = without_enter_schedule[0] + without_enter_schedule[1]
-        converted_timetable = without_enter_schedule.replace('.', ':')
-        converted_timetable = converted_timetable.replace(' :', ':')
-        if 'В день полной' in schedule_raw:
-            temp_time_full_change = re.search(r'В день полной\D*(\d*.\d*\s*.\s*\d*.\d*)', schedule_raw)
-            self.__exception_full_change = temp_time_full_change.group(1)
+        dict_schedule = dict()
 
-        if 'В день акции' in schedule_raw:
-            temp_time_all_by_3 = re.search(r'В день акции.*(\d\d.\d\d\s*.\s*\d\d.\d\d)', schedule_raw)
-            self.__exception_all_by_3 = temp_time_all_by_3.group(1)
-
-        days = str()
-        i = 0
-
-        for key, value in dict_schedule.items():
-            start_finish = re.search(r'(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # вытянули первое вхождение начала и конца рабочего дня
-            if re.search(f'{key}', converted_timetable):  # если в строке есть день недели
-                days = re.search(f'{key}\S*:', converted_timetable)  # вытянули его days
-                start_finish = re.search(f'{days.group(0)}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # воспользовались days как ориентиром, чтобы отыскать его время работы .\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)
-                value += self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
-            else:
-                if days != None and days.group(0)[2] == '-':
-                    start_finish = re.search(f'{days.group(0)}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)
-                    value += self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
-                else:
-                    value += self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
-            i += 1
+        for i in range(7):
+            dict_schedule[self.list_week[i]] = self.convert_to_datetime(start_finish_time.group(1), start_finish_time.group(2), i)
 
         return dict_schedule
 
     def update_special_day(self, dict_schedule, dict_discounts, str_work_hours):
-        start_finish = re.search(r'(\S+)\s+.\s+(\S+)', str_work_hours)
-        i = 0  # счетчик дней, до 'Полной смены товара'
+        start_finish = re.search(r'(\S+)\s+.*\s+(\S+)', str_work_hours)
+        day_counter = 0  # счетчик дней, до 'Полной смены товара'
         for key, value in dict_discounts.items():
             for j in value:
-                if 'Полная смена товара' in j:
-                    dict_schedule[key] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
-                if 'Всё по 3 рубля' in j:
-                    dict_schedule[key] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
-            i += 1
+                if '90%' in j:
+                    dict_schedule[key] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), day_counter)
+            day_counter += 1
 
         return dict_schedule
 

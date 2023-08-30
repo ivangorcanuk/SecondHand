@@ -136,3 +136,54 @@ class AdzenneParser:
         return dict_shop_data
 
 
+class MegahandParser:
+    url = 'https://mega-hand.by/magaziny/minsk/'
+    headers = {
+        'Accept': '*/*',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/116.0'
+    }
+
+    def __init__(self):
+        self.__dikt_url_minsk_shops = None
+
+    def __get_url_all_shops_network(self):  # вернули ссылку со всеми магазинами города Минска
+        req = requests.get(self.url, headers=self.headers)
+        soup = BS(req.content, 'lxml')
+        all_shop = soup.find_all(class_='sity_magazin')
+        dict_shop = dict()
+        for i in all_shop:
+            if 'магазин МЕГАХЕНД в Минске' in i.text:
+                link = i.find('a', class_='public-life__image-link')
+                address = i.find(class_='top_shop_blok_desc')
+                dict_shop[address.text] = link.get('href')
+        return dict_shop
+
+    def get_data(self):
+        self.__dikt_url_minsk_shops = self.__get_url_all_shops_network()
+        count = 0
+        dict_shop_data = dict()
+        for key, value in self.__dikt_url_minsk_shops.items():
+            #if count < 1:
+            req_1 = requests.get(value, headers=self.headers)
+            soup_1 = BS(req_1.content, 'lxml')
+
+            scripts_all = soup_1.find_all('script', type='text/javascript')
+            list_of_dictionaries = None
+            for script in scripts_all:
+                if 'var data' in str(script):
+                    script = str(script).replace('\n', '@')
+                    script_calendar = re.search(r'var data =\s*(.+]);\s*', script)
+                    script_calendar = script_calendar.group(1).replace('@', '\n')
+                    list_of_dictionaries = json.loads(script_calendar)
+
+            so = soup_1.find_all(class_="top_shop_blok")
+            work_time = None
+            for i in so:
+                if 'Ежедневно' in i.text:
+                    work_time = i.find(class_="top_shop_blok_desc")
+
+            list_of_dictionaries.append(work_time)
+            dict_shop_data[key] = list_of_dictionaries
+            count += 1
+
+        return dict_shop_data

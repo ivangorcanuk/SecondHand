@@ -69,7 +69,9 @@ class ModaMaxParserDataProcessor:
 class EconomCityParserDataProcessor:
     list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
     list_discount = ['День сеньора', '3я вещь в подарок', 'Большое пополнение', '-20%', '-30%', '-40%', '-50%', '-60%',
-                     'Всё по 3 рубля', 'Полна смена товара', 'обувь + текстиль', 'Детский день']
+                     'Всё по 3 рубля', 'Полна смена товара', 'обувь + текстиль', 'Детский день', 'Текстиль',
+                     'Товар премиум', 'x2 скидка по дисконту', '4я вещь в подарок', 'Пополнение товара', '-80%',
+                     'Большое поступление', 'Полная смена товара + винтаж', 'Обувь+текстиль', '-70%']
 
     def __init__(self):
         self.__list_shops = list()
@@ -87,11 +89,13 @@ class EconomCityParserDataProcessor:
             if self.__exception_all_by_3:
                 dict_schedule = self.update_special_day(dict_schedule, dict_discounts, self.__exception_all_by_3)
             self.__list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
-            # print(key)
-            # for key, value in dict_schedule.items():
-            #     print(key, value)
-            # for key, value in dict_discounts.items():
-            #     print(key, value)
+            print(key)
+            print('**')
+            for key, value in dict_schedule.items():
+                print(key, value)
+            print('**')
+            for key, value in dict_discounts.items():
+                print(key, value)
         return self.__list_shops
 
     def get_discount(self, list_discounts):
@@ -105,6 +109,15 @@ class EconomCityParserDataProcessor:
                     data_discount = re.search(r'\n(.+)\n+\s*(.*)\n\s*(.*)\n*$', list_discounts[j].text)
                     dict_discounts[self.list_week[ind]] = [data_discount.group(2), data_discount.group(3)]
                     ind += 1
+        for key, value in dict_discounts.items():
+            list_temp = []
+            for discount in value:
+                for i in self.list_discount:
+                    if i in discount:
+                        list_temp.append(i)
+            if not len(list_temp):
+                list_temp.append('')
+            dict_discounts[key] = list_temp
         return dict_discounts
 
     def convert_to_datetime(self, start, finish, day_number):
@@ -116,16 +129,12 @@ class EconomCityParserDataProcessor:
         date_time_finsh = datetime.strptime(str_datetime_finsh, '%Y-%m-%d %H:%M')
         return [date_time_start, date_time_finsh]
 
+    def conv(self, day_number, converted_timetable, dict_schedule, days=''):
+        start_finish = re.search(f'{days}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # воспользовались days как ориентиром, чтобы отыскать его время работы .\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)
+        dict_schedule[self.list_week[day_number]] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), day_number)
+        return dict_schedule
+
     def get_schedule(self, schedule_raw):
-        dict_schedule = {
-            'Пн': [],
-            'Вт': [],
-            'Ср': [],
-            'Чт': [],
-            'Пт': [],
-            'Сб': [],
-            'Вс': [],
-        }
 
         without_enter_schedule = re.search(r'(.*\n*.+)\nВ день полной', schedule_raw)
         without_enter_schedule = without_enter_schedule.group(1).replace('\r', '')
@@ -142,21 +151,21 @@ class EconomCityParserDataProcessor:
             self.__exception_all_by_3 = temp_time_all_by_3.group(1)
 
         days = str()
-        i = 0
+        dict_schedule = dict()
 
-        for key, value in dict_schedule.items():
-            start_finish = re.search(r'(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # вытянули первое вхождение начала и конца рабочего дня
-            if re.search(f'{key}', converted_timetable):  # если в строке есть день недели
-                days = re.search(f'{key}\S*:', converted_timetable)  # вытянули его days
-                start_finish = re.search(f'{days.group(0)}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # воспользовались days как ориентиром, чтобы отыскать его время работы .\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)
-                value += self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
+        for i in range(7):
+            if re.search(f'{self.list_week[i]}', converted_timetable):  # если в строке есть день недели
+                days = re.search(f'{self.list_week[i]}\S*:', converted_timetable)  # вытянули его days
+                days = days.group(0)
+                dict_schedule = self.conv(i, converted_timetable, dict_schedule, days)
             else:
-                if days != None and days.group(0)[2] == '-':
-                    start_finish = re.search(f'{days.group(0)}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)
-                    value += self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
+                if days != '':
+                    if days != None and days[2] == '-':
+                        dict_schedule = self.conv(i, converted_timetable, dict_schedule, days)
+                    else:
+                        dict_schedule = self.conv(i, converted_timetable, dict_schedule)
                 else:
-                    value += self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
-            i += 1
+                    dict_schedule[self.list_week[i]] = None
 
         return dict_schedule
 

@@ -77,7 +77,7 @@ class EconomCityParser:
         count = 0
         dict_shop_data = dict()
         for key, value in self.__dikt_url_minsk_shops.items():
-            #if key == 'Рокоссовского, 49':  # Рокоссовского, 49
+            #if key == 'Сухаревская, 5':  # Сухаревская, 5
             req_1 = requests.get(value, headers=self.headers)
             soup_1 = BS(req_1.content, 'lxml')
             work_time = soup_1.find(class_="shopMap__info-description")
@@ -163,27 +163,28 @@ class MegahandParser:
         count = 0
         dict_shop_data = dict()
         for key, value in self.__dikt_url_minsk_shops.items():
-            #if count < 1:
-            req_1 = requests.get(value, headers=self.headers)
-            soup_1 = BS(req_1.content, 'lxml')
+            if count < 1:
+                req_1 = requests.get(value, headers=self.headers)
+                soup_1 = BS(req_1.content, 'lxml')
+                print(soup_1)
 
-            scripts_all = soup_1.find_all('script', type='text/javascript')
-            list_of_dictionaries = None
-            for script in scripts_all:
-                if 'var data' in str(script):
-                    script = str(script).replace('\n', '@')
-                    script_calendar = re.search(r'var data =\s*(.+]);\s*', script)
-                    script_calendar = script_calendar.group(1).replace('@', '\n')
-                    list_of_dictionaries = json.loads(script_calendar)
+                scripts_all = soup_1.find_all('script', type='text/javascript')
+                list_of_dictionaries = None
+                for script in scripts_all:
+                    script_str = str(script)
+                    if 'var data' in script_str:
+                        script_calendar = script_str[script_str.index('['):script_str.index(']')+1]
+                        list_of_dictionaries = json.loads(script_calendar)
+                        print(type(list_of_dictionaries))
 
-            so = soup_1.find_all(class_="top_shop_blok")
-            work_time = None
-            for i in so:
-                if 'Ежедневно' in i.text:
-                    work_time = i.find(class_="top_shop_blok_desc")
+                so = soup_1.find_all(class_="top_shop_blok")
+                work_time = None
+                for i in so:
+                    if 'Ежедневно' in i.text:
+                        work_time = i.find(class_="top_shop_blok_desc")
 
-            list_of_dictionaries.append(work_time)
-            dict_shop_data[key] = list_of_dictionaries
-            count += 1
+                list_of_dictionaries.append(work_time)
+                dict_shop_data[key] = list_of_dictionaries
+                count += 1
 
         return dict_shop_data

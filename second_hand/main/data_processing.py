@@ -3,19 +3,67 @@ import re
 from datetime import datetime, date, timedelta
 
 
-class ModaMaxParserDataProcessor:
+class Data:
+    list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+
+    def __int__(self):
+        self.list_shops = list()
+        #self.dict_raw_data_shops = dict()
+
+    def convert_to_datetime(self, start, finish, day_number):
+        monday = date.today() - timedelta(days=date.weekday(date.today()))  # вернули понедельник
+        dat = str(monday + timedelta(days=day_number))
+        str_datetime_start = dat + ' ' + start
+        str_datetime_finsh = dat + ' ' + finish
+        date_time_start = datetime.strptime(str_datetime_start, '%Y-%m-%d %H:%M')
+        date_time_finsh = datetime.strptime(str_datetime_finsh, '%Y-%m-%d %H:%M')
+        return [date_time_start, date_time_finsh]
+
+    def conv(self, day_number, converted_timetable, dict_schedule, days=''):
+        start_finish = re.search(f'{days}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # воспользовались days как ориентиром, чтобы отыскать его время работы .\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)
+        dict_schedule[self.list_week[day_number]] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), day_number)
+        return dict_schedule
+
+    def get_schedule(self, converted_timetable):
+        converted_timetable = converted_timetable.replace('.', ':')
+        day = str()
+        dict_schedule = dict()
+
+        for i in range(7):
+            if self.list_week[i] in converted_timetable:  # если в строке есть день недели
+                day = re.search(f'{self.list_week[i]}\S*:', converted_timetable)  # вытянули его days
+                day = day.group(0)
+                dict_schedule = self.conv(i, converted_timetable, dict_schedule, day)
+            else:
+                if day != '':
+                    if day[2] == '-':
+                        dict_schedule = self.conv(i, converted_timetable, dict_schedule, day)
+                    else:
+                        dict_schedule = self.conv(i, converted_timetable, dict_schedule)
+                else:
+                    dict_schedule[self.list_week[i]] = None
+
+        return dict_schedule
+
+
+class ModaMaxParserDataProcessor(Data):
     def __init__(self):
+        #Data.__init__(self)
         self.__list_shops = list()
         self.__modamax_data = dict()
 
     def get_parsing_results(self):
         self.__modamax_data = ModaMaxParser().get_data()
         for key, value in self.__modamax_data.items():
-            dict_schedule = self.get_schedule(value[-1].text)
-            dict_discount = self.get_discount(value[:-1])
-            self.__list_shops.append(ShopsData(key, dict_schedule, dict_discount))
-        # for value in self.__list_shops:
-        #     print(value.address)
+            dict_schedule = Data.get_schedule(self, value[-1].text)
+            dict_discounts = self.get_discount(value[:-1])
+            self.__list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
+            print(key)
+            for key, value in dict_schedule.items():
+                print(key, value)
+            for key, value in dict_discounts.items():
+                print(key, value)
+        print('ASD')
         return self.__list_shops
 
     def get_discount(self, many_descaunt):
@@ -25,53 +73,12 @@ class ModaMaxParserDataProcessor:
             dict_[many.group(1).capitalize()] = [many.group(2) + '.' + many.group(3), many.group(4), many.group(5)]
         return dict_
 
-    def time(self, start, finish, day_number):
-        monday = date.today() - timedelta(days=date.weekday(date.today()))  # вернули понедельник
-        dat = str(monday + timedelta(days=day_number))
-        str_datetime_start = dat + ' ' + start
-        str_datetime_finsh = dat + ' ' + finish
-        date_time_start = datetime.strptime(str_datetime_start, '%Y-%m-%d %H:%M')
-        date_time_finsh = datetime.strptime(str_datetime_finsh, '%Y-%m-%d %H:%M')
-        return [date_time_start, date_time_finsh]
 
-    def get_schedule(self, schedule):
-        dict_week = {
-            'Пн': [],
-            'Вт': [],
-            'Ср': [],
-            'Чт': [],
-            'Пт': [],
-            'Сб': [],
-            'Вс': [],
-        }
-        days = str()
-        i = 0
-        if '.' in schedule:
-            schedule = schedule.replace('.', ':')
-
-        for key, value in dict_week.items():
-            start_finish = re.search(r'(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', schedule)  # вытянули первое вхождение начала и конца рабочего дня
-            if re.search(f'{key}', schedule):  # если в строке есть день недели
-                days = re.search(f'{key}\S*:', schedule)  # вытянули его days
-                start_finish = re.search(f'{days.group(0)}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', schedule)  # воспользовались days как ориентиром, чтобы отыскать его время работы .\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)
-                value += self.time(start_finish.group(1), start_finish.group(2), i)
-            else:
-                if days != None and days.group(0)[2] == '-':
-                    start_finish = re.search(f'{days.group(0)}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', schedule)
-                    value += self.time(start_finish.group(1), start_finish.group(2), i)
-                else:
-                    value += self.time(start_finish.group(1), start_finish.group(2), i)
-            i += 1
-
-        return dict_week
-
-
-class EconomCityParserDataProcessor:
-    list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+class EconomCityParserDataProcessor(Data):
     list_discount = ['День сеньора', '3я вещь в подарок', 'Большое пополнение', '-20%', '-30%', '-40%', '-50%', '-60%',
                      'Всё по 3 рубля', 'Полна смена товара', 'обувь + текстиль', 'Детский день', 'Текстиль',
                      'Товар премиум', 'x2 скидка по дисконту', '4я вещь в подарок', 'Пополнение товара', '-80%',
-                     'Большое поступление', 'Полная смена товара + винтаж', 'Обувь+текстиль', '-70%']
+                     'Большое поступление', 'винтаж', 'Обувь+текстиль', '-70%']
 
     def __init__(self):
         self.__list_shops = list()
@@ -90,10 +97,8 @@ class EconomCityParserDataProcessor:
                 dict_schedule = self.update_special_day(dict_schedule, dict_discounts, self.__exception_all_by_3)
             self.__list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
             print(key)
-            print('**')
             for key, value in dict_schedule.items():
                 print(key, value)
-            print('**')
             for key, value in dict_discounts.items():
                 print(key, value)
         return self.__list_shops
@@ -103,12 +108,14 @@ class EconomCityParserDataProcessor:
         day_of_week = date.weekday(date.today())  # хранит сегоднешний день в цифре 0..6
         # "temp_.." - времен. переменная "cur" - текущая переменная
         ind = 0
+
         for i in range(len(list_discounts)):
             if 'Cегодня' in list_discounts[i].text:
                 for j in range(i - day_of_week, i - day_of_week + 7):
                     data_discount = re.search(r'\n(.+)\n+\s*(.*)\n\s*(.*)\n*$', list_discounts[j].text)
                     dict_discounts[self.list_week[ind]] = [data_discount.group(2), data_discount.group(3)]
                     ind += 1
+
         for key, value in dict_discounts.items():
             list_temp = []
             for discount in value:
@@ -118,21 +125,8 @@ class EconomCityParserDataProcessor:
             if not len(list_temp):
                 list_temp.append('')
             dict_discounts[key] = list_temp
+
         return dict_discounts
-
-    def convert_to_datetime(self, start, finish, day_number):
-        monday = date.today() - timedelta(days=date.weekday(date.today()))  # вернули понедельник
-        dat = str(monday + timedelta(days=day_number))
-        str_datetime_start = dat + ' ' + start
-        str_datetime_finsh = dat + ' ' + finish
-        date_time_start = datetime.strptime(str_datetime_start, '%Y-%m-%d %H:%M')
-        date_time_finsh = datetime.strptime(str_datetime_finsh, '%Y-%m-%d %H:%M')
-        return [date_time_start, date_time_finsh]
-
-    def conv(self, day_number, converted_timetable, dict_schedule, days=''):
-        start_finish = re.search(f'{days}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # воспользовались days как ориентиром, чтобы отыскать его время работы .\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)
-        dict_schedule[self.list_week[day_number]] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), day_number)
-        return dict_schedule
 
     def get_schedule(self, schedule_raw):
 
@@ -140,8 +134,7 @@ class EconomCityParserDataProcessor:
         without_enter_schedule = without_enter_schedule.group(1).replace('\r', '')
         without_enter_schedule = without_enter_schedule.split('\n')
         without_enter_schedule = without_enter_schedule[0] + without_enter_schedule[1]
-        converted_timetable = without_enter_schedule.replace('.', ':')
-        converted_timetable = converted_timetable.replace(' :', ':')
+        converted_timetable = without_enter_schedule.replace(' :', ':')
         if 'В день полной' in schedule_raw:
             temp_time_full_change = re.search(r'В день полной\D*(\d*.\d*\s*.\s*\d*.\d*)', schedule_raw)
             self.__exception_full_change = temp_time_full_change.group(1)
@@ -150,24 +143,7 @@ class EconomCityParserDataProcessor:
             temp_time_all_by_3 = re.search(r'В день акции.*(\d\d.\d\d\s*.\s*\d\d.\d\d)', schedule_raw)
             self.__exception_all_by_3 = temp_time_all_by_3.group(1)
 
-        days = str()
-        dict_schedule = dict()
-
-        for i in range(7):
-            if re.search(f'{self.list_week[i]}', converted_timetable):  # если в строке есть день недели
-                days = re.search(f'{self.list_week[i]}\S*:', converted_timetable)  # вытянули его days
-                days = days.group(0)
-                dict_schedule = self.conv(i, converted_timetable, dict_schedule, days)
-            else:
-                if days != '':
-                    if days != None and days[2] == '-':
-                        dict_schedule = self.conv(i, converted_timetable, dict_schedule, days)
-                    else:
-                        dict_schedule = self.conv(i, converted_timetable, dict_schedule)
-                else:
-                    dict_schedule[self.list_week[i]] = None
-
-        return dict_schedule
+        return Data.get_schedule(self, converted_timetable)
 
     def update_special_day(self, dict_schedule, dict_discounts, str_work_hours):
         start_finish = re.search(r'(\S+)\s+.\s+(\S+)', str_work_hours)
@@ -183,8 +159,7 @@ class EconomCityParserDataProcessor:
         return dict_schedule
 
 
-class AdzenneParserDataProcessor:
-    list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+class AdzenneParserDataProcessor(Data):
     list_week_bel = ['пн', 'аў', 'ср', 'чц', 'пт', 'сб', 'ндз']
     list_streets = [
         ('Крама па вул. Бурдзейнага, 8', 'ул. Бурдейного, 8'),
@@ -213,7 +188,7 @@ class AdzenneParserDataProcessor:
         self.__adzenne_data = AdzenneParser().get_data()
         for key, value in self.__adzenne_data.items():
             street = self.translate_street_bel(key)
-            dict_schedule = self.get_schedule(street, value[-1])
+            dict_schedule = self.schedule(street, value[-1])
             dict_discounts = self.get_discount(value[:-1])
             dict_schedule = self.update_special_day(dict_discounts, dict_schedule)
             self.__list_shops.append(ShopsData(street, dict_schedule, dict_discounts))
@@ -257,20 +232,6 @@ class AdzenneParserDataProcessor:
                 break
         return dict_discounts
 
-    def convert_to_datetime(self, start, finish, day_number):
-        monday = date.today() - timedelta(days=date.weekday(date.today()))  # вернули понедельник
-        dat = str(monday + timedelta(days=day_number))
-        str_datetime_start = dat + ' ' + start
-        str_datetime_finsh = dat + ' ' + finish
-        date_time_start = datetime.strptime(str_datetime_start, '%Y-%m-%d %H:%M')
-        date_time_finsh = datetime.strptime(str_datetime_finsh, '%Y-%m-%d %H:%M')
-        return [date_time_start, date_time_finsh]
-
-    def conv(self, day_number, converted_timetable, dict_schedule, days=''):
-        start_finish = re.search(f'{days}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # воспользовались days как ориентиром, чтобы отыскать его время работы .\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)
-        dict_schedule[self.list_week[day_number]] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), day_number)
-        return dict_schedule
-
     def translate_from_bel(self, schedule_by):
         schedule_ru = schedule_by.lower()
         for i in range(len(self.list_week_bel)):
@@ -278,35 +239,15 @@ class AdzenneParserDataProcessor:
                 schedule_ru = schedule_ru.replace(self.list_week_bel[i], self.list_week[i])
         return schedule_ru
 
-    def get_schedule(self, street, schedule_raw):
-
+    def schedule(self, street, schedule_raw):
         converted_timetable = schedule_raw.replace('\n', '')
-        converted_timetable = converted_timetable.replace('.', ':')
         converted_timetable = converted_timetable.replace('\xa0', ': ')
         if street == 'ул. Веры Хоружей, 8':
             converted_timetable = re.search(r'.*\d', converted_timetable)
             converted_timetable = converted_timetable.group(0)
         converted_timetable = self.translate_from_bel(converted_timetable)
 
-        days = str()
-        dict_schedule = dict()
-
-        for i in range(7):
-            if re.search(f'{self.list_week[i]}', converted_timetable):  # если в строке есть день недели
-                days = re.search(f'{self.list_week[i]}\S*:', converted_timetable)  # вытянули его days
-                days = days.group(0)
-                dict_schedule = self.conv(i, converted_timetable, dict_schedule, days)
-            else:
-                if days != '':
-                    if days != None and days[2] == '-':
-                        dict_schedule = self.conv(i, converted_timetable, dict_schedule, days)
-                    else:
-                        dict_schedule = self.conv(i, converted_timetable, dict_schedule)
-                else:
-                    dict_schedule[self.list_week[i]] = None
-            i += 1
-
-        return dict_schedule
+        return Data.get_schedule(self, converted_timetable)
 
     def update_special_day(self, dict_discounts, dict_schedule):
         i = 0  # счетчик дней, до 'Полной смены товара'
@@ -327,7 +268,7 @@ class AdzenneParserDataProcessor:
         return dict_schedule
 
 
-class MegahandParserDataProcessor:  # MegahandParser
+class MegahandParserDataProcessor(Data):  # MegahandParser
     list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
     list_address = [
         ('Брикета', 'ул. Брикета, 2'),
@@ -376,7 +317,7 @@ class MegahandParserDataProcessor:  # MegahandParser
                 if monday == date_time_obj.date() or is_cur_week:
                     is_cur_week = True
                     if key == 'class':
-                        dict_discounts[self.list_week[day_number]] = [value]
+                        dict_discounts[self.list_week[day_number]] = [value.strip()]
                     if key == 'skidka':
                         dict_discounts[self.list_week[day_number]] += [value]
             if is_cur_week:
@@ -384,15 +325,6 @@ class MegahandParserDataProcessor:  # MegahandParser
             if day_number == 7:
                 break
         return dict_discounts
-
-    def convert_to_datetime(self, start, finish, day_number):
-        monday = date.today() - timedelta(days=date.weekday(date.today()))  # вернули понедельник
-        dat = str(monday + timedelta(days=day_number))
-        str_datetime_start = dat + ' ' + start
-        str_datetime_finsh = dat + ' ' + finish
-        date_time_start = datetime.strptime(str_datetime_start, '%Y-%m-%d %H:%M')
-        date_time_finsh = datetime.strptime(str_datetime_finsh, '%Y-%m-%d %H:%M')
-        return [date_time_start, date_time_finsh]
 
     def get_schedule(self, schedule_raw):
         start_finish_time = None
@@ -405,7 +337,7 @@ class MegahandParserDataProcessor:  # MegahandParser
         dict_schedule = dict()
 
         for i in range(7):
-            dict_schedule[self.list_week[i]] = self.convert_to_datetime(start_finish_time.group(1), start_finish_time.group(2), i)
+            dict_schedule[self.list_week[i]] = Data.convert_to_datetime(self, start_finish_time.group(1), start_finish_time.group(2), i)
 
         return dict_schedule
 
@@ -415,7 +347,7 @@ class MegahandParserDataProcessor:  # MegahandParser
         for key, value in dict_discounts.items():
             for j in value:
                 if '90%' in j:
-                    dict_schedule[key] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), day_counter)
+                    dict_schedule[key] = Data.convert_to_datetime(self, start_finish.group(1), start_finish.group(2), day_counter)
             day_counter += 1
 
         return dict_schedule

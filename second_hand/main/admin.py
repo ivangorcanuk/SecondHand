@@ -56,10 +56,19 @@ class PromotionDays(admin.ModelAdmin):
         return f'{self.week_number}'
 
 
+# @admin.register(GeneralPromotions)
+# class GeneralPromotions(admin.ModelAdmin):
+#     list_display = ['id', 'name', 'value', 'decoding']
+#     #list_editable = ['name', 'value', 'decoding']  # список изменения полей
+#
+#     def __str__(self):
+#         return f'{self.name} - {self.value} - {self.decoding}'
+
+
 @admin.register(PromotionsRegister)
 class PromotionsRegister(admin.ModelAdmin):
-    list_display = ['id', 'promotion_name', 'value']
+    list_display = ['id', 'promotion_name', 'store_network', 'value', 'general_promotions', 'decoding']
     #list_editable = ['number_stars', 'rating']  # список изменения полей
 
     def __str__(self):
-        return f'{self.promotion_name} - {self.value}'
+        return f'{self.promotion_name} - {self.store_network} - {self.unique_value}'

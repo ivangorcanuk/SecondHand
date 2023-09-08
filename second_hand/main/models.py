@@ -25,28 +25,40 @@ class LinkSocNetworks(models.Model):  # ссылки на соц сети и о�
 
 
 class OpenHours(models.Model):  # рабочее время
-    mon_st = models.DateTimeField()
-    mon_fn = models.DateTimeField()
-    tue_st = models.DateTimeField()
-    tue_fn = models.DateTimeField()
-    wed_st = models.DateTimeField()
-    wed_fn = models.DateTimeField()
-    thu_st = models.DateTimeField()
-    thu_fn = models.DateTimeField()
-    fri_st = models.DateTimeField()
-    fri_fn = models.DateTimeField()
-    sat_st = models.DateTimeField()
-    sat_fn = models.DateTimeField()
-    sun_st = models.DateTimeField()
-    sun_fn = models.DateTimeField()
+    mon_st = models.DateTimeField(null=True, blank=True)
+    mon_fn = models.DateTimeField(null=True, blank=True)
+    tue_st = models.DateTimeField(null=True, blank=True)
+    tue_fn = models.DateTimeField(null=True, blank=True)
+    wed_st = models.DateTimeField(null=True, blank=True)
+    wed_fn = models.DateTimeField(null=True, blank=True)
+    thu_st = models.DateTimeField(null=True, blank=True)
+    thu_fn = models.DateTimeField(null=True, blank=True)
+    fri_st = models.DateTimeField(null=True, blank=True)
+    fri_fn = models.DateTimeField(null=True, blank=True)
+    sat_st = models.DateTimeField(null=True, blank=True)
+    sat_fn = models.DateTimeField(null=True, blank=True)
+    sun_st = models.DateTimeField(null=True, blank=True)
+    sun_fn = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.id}'
 
 
+# class GeneralPromotions(models.Model):
+#     name = models.CharField(max_length=50)
+#     value = models.IntegerField(null=True, blank=True)
+#     decoding = models.TextField(null=True, blank=True)
+#
+#     def __str__(self):
+#         return f'{self.name}'
+
+
 class PromotionsRegister(models.Model):  # все возможные акции и их процентное соотношение
     promotion_name = models.CharField(max_length=50)
-    value = models.IntegerField()
+    store_network = models.CharField(max_length=50, null=True, blank=True)
+    value = models.CharField(max_length=50, null=True, blank=True)
+    general_promotions = models.CharField(max_length=50, null=True, blank=True)  # УБРАТЬ blank=True, пересмотреть on_delete=models.CASCADE
+    decoding = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.promotion_name}'

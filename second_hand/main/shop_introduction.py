@@ -3,13 +3,7 @@ from datetime import datetime, date
 
 
 class Store:
-    dict_weekdays = {0: 'Пн',
-                     1: 'Вт',
-                     2: 'Ср',
-                     3: 'Чт',
-                     4: 'Пт',
-                     5: 'Сб',
-                     6: 'Вс'}
+    list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 
     def __init__(self, id_store, name_store, country, city, address, number_phone,
                  number_stars, rating, store_network, open_hours, promotion_days):
@@ -23,13 +17,13 @@ class Store:
         self.rating = rating
         self.store_network = store_network
         self.list_open_hours = [
-                        (open_hours.mon_st, open_hours.mon_fn),
-                        (open_hours.tue_st, open_hours.tue_fn),
-                        (open_hours.wed_st, open_hours.wed_fn),
-                        (open_hours.thu_st, open_hours.thu_fn),
-                        (open_hours.fri_st, open_hours.fri_fn),
-                        (open_hours.sat_st, open_hours.sat_fn),
-                        (open_hours.sun_st, open_hours.sun_fn)
+                        [open_hours.mon_st, open_hours.mon_fn],
+                        [open_hours.tue_st, open_hours.tue_fn],
+                        [open_hours.wed_st, open_hours.wed_fn],
+                        [open_hours.thu_st, open_hours.thu_fn],
+                        [open_hours.fri_st, open_hours.fri_fn],
+                        [open_hours.sat_st, open_hours.sat_fn],
+                        [open_hours.sun_st, open_hours.sun_fn]
                                ]
         self.list_promotion = [
                         promotion_days.monday,
@@ -40,16 +34,24 @@ class Store:
                         promotion_days.saturday,
                         promotion_days.sunday
                                ]
+        for day in self.list_open_hours:
+            if day[0] is None and day[1] is None:
+                temp = datetime(year=2001, month=1, day=1, hour=0, minute=0, second=0)  # временно обозначили выходной
+                day[0] = temp
+                day[1] = temp
+
         self.opening_hours_today_text = self.get_todays_open_hours()  # готовая строка для отображения рабочего времени
         self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
-        self.list_promotion_days = self.get_list_promotion_days()
+        self.list_promotion_days = self.get_promotion_list_by_id()
 
     def get_todays_open_hours(self):
         for day in self.list_open_hours:
             if date.today() == day[0].date():
                 start_str = datetime.strptime(str(day[0].time()), "%H:%M:%S").strftime("%H:%M")
                 finish_str = datetime.strptime(str(day[1].time()), "%H:%M:%S").strftime("%H:%M")
+                print(start_str + ' - ' + finish_str)
                 return start_str + ' - ' + finish_str
+        return 'Выходной'
 
     def get_time_str(self, day, first_day=str(), second_day=str()):
         start_str = datetime.strptime(str(day[0].time()), "%H:%M:%S").strftime("%H:%M")
@@ -71,30 +73,41 @@ class Store:
             if is_new_sequence:
                 first_day = i - 1
             if (self.list_open_hours[i - 1][0].time() == self.list_open_hours[i][0].time()) and \
-                    (self.list_open_hours[i - 1][1].time() == self.list_open_hours[i][1].time()):
+                    (self.list_open_hours[i - 1][1].time() == self.list_open_hours[i][1].time()):  # если вчера и сегодня работа начинается и заканчивается в одно время
                 is_new_sequence = False
             elif (self.list_open_hours[i - 1][0].time() != self.list_open_hours[i][0].time() or
                   self.list_open_hours[i - 1][1].time() != self.list_open_hours[i][1].time()) or i == 6:
                 if first_day != i - 1:
-                    forma = self.get_time_str(self.list_open_hours[i - 1], self.dict_weekdays[first_day], self.dict_weekdays[i - 1])
+                    forma = self.get_time_str(self.list_open_hours[i - 1], self.list_week[first_day], self.list_week[i - 1])
                 else:
-                    forma = self.get_time_str(self.list_open_hours[i - 1], self.dict_weekdays[first_day])
+                    forma = self.get_time_str(self.list_open_hours[i - 1], self.list_week[first_day])
                 list_days_open_hours.append(forma)
                 is_new_sequence = True
         if (self.list_open_hours[-1][0].time() != self.list_open_hours[-2][0].time()) or \
                 (self.list_open_hours[-1][1].time() != self.list_open_hours[-2][1].time()):
-            list_days_open_hours.append(self.get_time_str(self.list_open_hours[-1], self.dict_weekdays[6]))
+            list_days_open_hours.append(self.get_time_str(self.list_open_hours[-1], self.list_week[6]))
         else:
-            list_days_open_hours.append(self.get_time_str(self.list_open_hours[-1], self.dict_weekdays[first_day], self.dict_weekdays[6]))
+            list_days_open_hours.append(self.get_time_str(self.list_open_hours[-1], self.list_week[first_day], self.list_week[6]))
+
+        for i in range(len(list_days_open_hours)):
+            list_days_open_hours[i] = list_days_open_hours[i].replace('00:00 - 00:00', 'Выходной')
+        for schedule in list_days_open_hours:
+            print(schedule)
+
         return list_days_open_hours
 
-    def get_list_promotion_days(self):
-        lisT = list()
+    def get_promotion_list_by_id(self):
+        list_temp = list()
         for element in self.list_promotion:  # проходим по списку с id скидок
-            list_id_promotion = element.split('*')  # разбили склеиный элемент и поместили в отдельный список
             list_promotion = list()
-            for j in list_id_promotion:
-                promotion = PromotionsRegister.objects.get(id=int(j))
-                list_promotion.append(promotion.promotion_name)
-            lisT.append(tuple(list_promotion))
-        return lisT
+            if element == '':
+                list_promotion.append('Нет скидки')
+            else:
+                list_id_promotion = element.split('*')  # разбили склеиный элемент и поместили в отдельный список
+                for j in list_id_promotion:
+                    promotion = PromotionsRegister.objects.get(id=int(j))
+                    list_promotion.append(promotion.promotion_name)
+            list_temp.append(tuple(list_promotion))
+        for i in list_temp:
+            print(i)
+        return list_temp

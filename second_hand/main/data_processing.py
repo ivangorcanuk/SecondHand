@@ -3,12 +3,18 @@ import re
 from datetime import datetime, date, timedelta
 
 
-class Data:
+class DataProcessorBase:
     list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 
-    def __int__(self):
-        self.list_shops = list()
-        #self.dict_raw_data_shops = dict()
+    def __init__(self):
+        self._list_shops = list()
+        self._dict_raw_data_shops = dict()
+
+    def get_parsing_results(self):
+        pass
+
+    def get_network_name(self):
+        pass
 
     def convert_to_datetime(self, start, finish, day_number):
         monday = date.today() - timedelta(days=date.weekday(date.today()))  # вернули понедельник
@@ -19,8 +25,8 @@ class Data:
         date_time_finsh = datetime.strptime(str_datetime_finsh, '%Y-%m-%d %H:%M')
         return [date_time_start, date_time_finsh]
 
-    def conv(self, day_number, converted_timetable, dict_schedule, days=''):
-        start_finish = re.search(f'{days}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # воспользовались days как ориентиром, чтобы отыскать его время работы .\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)
+    def build_schedule(self, day_number, converted_timetable, dict_schedule, day=''):
+        start_finish = re.search(f'{day}.\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)', converted_timetable)  # воспользовались days как ориентиром, чтобы отыскать его время работы .\s*(\d*\d.\d\d*)\D+(\d*\d.\d\d*)
         dict_schedule[self.list_week[day_number]] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), day_number)
         return dict_schedule
 
@@ -33,38 +39,36 @@ class Data:
             if self.list_week[i] in converted_timetable:  # если в строке есть день недели
                 day = re.search(f'{self.list_week[i]}\S*:', converted_timetable)  # вытянули его days
                 day = day.group(0)
-                dict_schedule = self.conv(i, converted_timetable, dict_schedule, day)
+                dict_schedule = self.build_schedule(i, converted_timetable, dict_schedule, day)
             else:
                 if day != '':
                     if day[2] == '-':
-                        dict_schedule = self.conv(i, converted_timetable, dict_schedule, day)
+                        dict_schedule = self.build_schedule(i, converted_timetable, dict_schedule, day)
                     else:
-                        dict_schedule = self.conv(i, converted_timetable, dict_schedule)
+                        dict_schedule = self.build_schedule(i, converted_timetable, dict_schedule)
                 else:
                     dict_schedule[self.list_week[i]] = None
 
         return dict_schedule
 
 
-class ModaMaxParserDataProcessor(Data):
-    def __init__(self):
-        #Data.__init__(self)
-        self.__list_shops = list()
-        self.__modamax_data = dict()
+class ModaMaxParserDataProcessor(DataProcessorBase):
+    def get_network_name(self):
+        return 'Мода Макс'
 
     def get_parsing_results(self):
-        self.__modamax_data = ModaMaxParser().get_data()
-        for key, value in self.__modamax_data.items():
-            dict_schedule = Data.get_schedule(self, value[-1].text)
+        self._dict_raw_data_shops = ModaMaxParser().get_data()
+        for key, value in self._dict_raw_data_shops.items():
+            dict_schedule = DataProcessorBase.get_schedule(self, value[-1].text)
             dict_discounts = self.get_discount(value[:-1])
-            self.__list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
+            self._list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
             print(key)
             for key, value in dict_schedule.items():
                 print(key, value)
             for key, value in dict_discounts.items():
                 print(key, value)
         print('ASD')
-        return self.__list_shops
+        return self._list_shops
 
     def get_discount(self, many_descaunt):
         dict_ = dict()
@@ -74,34 +78,36 @@ class ModaMaxParserDataProcessor(Data):
         return dict_
 
 
-class EconomCityParserDataProcessor(Data):
-    list_discount = ['День сеньора', '3я вещь в подарок', 'Большое пополнение', '-20%', '-30%', '-40%', '-50%', '-60%',
-                     'Всё по 3 рубля', 'Полна смена товара', 'обувь + текстиль', 'Детский день', 'Текстиль',
-                     'Товар премиум', 'x2 скидка по дисконту', '4я вещь в подарок', 'Пополнение товара', '-80%',
-                     'Большое поступление', 'винтаж', 'Обувь+текстиль', '-70%']
+class EconomCityParserDataProcessor(DataProcessorBase):
+    list_discount = ['20%', '30%', '40%', '50%', '60%', '70%', '80%', 'День сеньора', '3я вещь в подарок',
+                     'Большое пополнение', 'Всё по 3 рубля', 'Полна смена товара', 'Детский день', 'Текстиль',
+                     'Товар премиум', 'x2 скидка по дисконту', '4я вещь в подарок', 'Пополнение товара',
+                     'Большое поступление', 'Винтаж', 'Обувь']
 
     def __init__(self):
-        self.__list_shops = list()
-        self.__economcity_data = dict()
+        DataProcessorBase.__init__(self)
         self.__exception_full_change = str()  # исключение работы магазина в день полной смены товара
         self.__exception_all_by_3 = str()  # исключение работы магазина в день акции все по 3 рубля
 
+    def get_network_name(self):
+        return 'Эконом Сити'
+
     def get_parsing_results(self):
-        self.__economcity_data = EconomCityParser().get_data()
-        for key, value in self.__economcity_data.items():
+        self._dict_raw_data_shops = EconomCityParser().get_data()
+        for key, value in self._dict_raw_data_shops.items():
             dict_schedule = self.get_schedule(value[-1].text)
             dict_discounts = self.get_discount(value[:-1])
             if self.__exception_full_change:
                 dict_schedule = self.update_special_day(dict_schedule, dict_discounts, self.__exception_full_change)
             if self.__exception_all_by_3:
                 dict_schedule = self.update_special_day(dict_schedule, dict_discounts, self.__exception_all_by_3)
-            self.__list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
+            self._list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
             print(key)
             for key, value in dict_schedule.items():
                 print(key, value)
             for key, value in dict_discounts.items():
                 print(key, value)
-        return self.__list_shops
+        return self._list_shops
 
     def get_discount(self, list_discounts):
         dict_discounts = dict()
@@ -120,7 +126,7 @@ class EconomCityParserDataProcessor(Data):
             list_temp = []
             for discount in value:
                 for i in self.list_discount:
-                    if i in discount:
+                    if i in discount or i in discount.title():
                         list_temp.append(i)
             if not len(list_temp):
                 list_temp.append('')
@@ -143,7 +149,7 @@ class EconomCityParserDataProcessor(Data):
             temp_time_all_by_3 = re.search(r'В день акции.*(\d\d.\d\d\s*.\s*\d\d.\d\d)', schedule_raw)
             self.__exception_all_by_3 = temp_time_all_by_3.group(1)
 
-        return Data.get_schedule(self, converted_timetable)
+        return DataProcessorBase.get_schedule(self, converted_timetable)
 
     def update_special_day(self, dict_schedule, dict_discounts, str_work_hours):
         start_finish = re.search(r'(\S+)\s+.\s+(\S+)', str_work_hours)
@@ -159,7 +165,7 @@ class EconomCityParserDataProcessor(Data):
         return dict_schedule
 
 
-class AdzenneParserDataProcessor(Data):
+class AdzenneParserDataProcessor(DataProcessorBase):
     list_week_bel = ['пн', 'аў', 'ср', 'чц', 'пт', 'сб', 'ндз']
     list_streets = [
         ('Крама па вул. Бурдзейнага, 8', 'ул. Бурдейного, 8'),
@@ -167,7 +173,7 @@ class AdzenneParserDataProcessor(Data):
         ('Крама па пр. Газеты Праўда, 17', 'пр. Газеты Правда, 17'),
         ('Крама па вул. Громава, 28', 'ул. Громова, 28'),
         ('Крама па пр. Жукава, 25/1', 'пр. Жукова, 25/1'),
-        ('Крама па вул. Кіжаватава, 66', 'ул. Лейтенанта Кижеватова, 66'),
+        ('Крама па вул. Кіжаватава, 66', 'ул. Кижеватова, 66'),
         ('Крама па вул. Матусевіча, 68', 'ул. Матусевича, 68'),
         ('Крама па вул. Маякоўскага, 16', 'ул. Маяковского, 16'),
         ('Крама па пр. Незалежнасці, 155/1', 'пр. Независимости, 155/1'),
@@ -178,26 +184,25 @@ class AdzenneParserDataProcessor(Data):
         ('Крама па вул. Сярова, 3а', 'ул. Серова, 3а'),
         ('Крама па вул. Л. Бяды, 39', 'ул. Леонида Беды, 39'),
         ('Крама па вул. В. Харужай, 8', 'ул. Веры Хоружей, 8')
-                    ]
+    ]
 
-    def __init__(self):
-        self.__list_shops = list()
-        self.__adzenne_data = dict()
+    def get_network_name(self):
+        return 'Адзенне'
 
     def get_parsing_results(self):
-        self.__adzenne_data = AdzenneParser().get_data()
-        for key, value in self.__adzenne_data.items():
+        self._dict_raw_data_shops = AdzenneParser().get_data()
+        for key, value in self._dict_raw_data_shops.items():
             street = self.translate_street_bel(key)
             dict_schedule = self.schedule(street, value[-1])
             dict_discounts = self.get_discount(value[:-1])
             dict_schedule = self.update_special_day(dict_discounts, dict_schedule)
-            self.__list_shops.append(ShopsData(street, dict_schedule, dict_discounts))
+            self._list_shops.append(ShopsData(street, dict_schedule, dict_discounts))
             print(street)
             for key, value in dict_schedule.items():
                 print(key, value)
             for key, value in dict_discounts.items():
                 print(key, value)
-        return self.__list_shops
+        return self._list_shops
 
     def translate_street_bel(self, street_by):
         for i in range(len(self.list_streets)):
@@ -247,56 +252,60 @@ class AdzenneParserDataProcessor(Data):
             converted_timetable = converted_timetable.group(0)
         converted_timetable = self.translate_from_bel(converted_timetable)
 
-        return Data.get_schedule(self, converted_timetable)
+        return DataProcessorBase.get_schedule(self, converted_timetable)
 
     def update_special_day(self, dict_discounts, dict_schedule):
         i = 0  # счетчик дней, до 'Полной смены товара'
         for key, value in dict_discounts.items():
             if '/Х' in value[0]:
-                finish = re.search(r'\d*', value[0])
-                finish = finish.group(0) + ':' + '00'
+                finish = re.search(r'(\d*).Х', value[0])
+                finish = finish.group(1) + ':' + '00'
                 monday = date.today() - timedelta(days=date.weekday(date.today()))  # вернули понедельник
                 dat = str(monday + timedelta(days=i))
                 str_datetime_finsh = dat + ' ' + finish
                 date_time_finsh = datetime.strptime(str_datetime_finsh, '%Y-%m-%d %H:%M')
-                dict_schedule[key][1] = [date_time_finsh]  # изменили время конца рабочего дня
-                continue
-            if ':)' in value[0] or 'Х' in value[0]:
-                dict_schedule[key] = ['Выходной']
+                dict_schedule[key][1] = date_time_finsh  # изменили время конца рабочего дня
+                if len(value[0]) == 4:
+                    dict_discounts[key] = ['']
+                if len(value[0]) > 4:
+                    dict_discounts[key] = [value[0][:2]]
+            if ':)' == value[0] or 'Х' == value[0]:
+                dict_schedule[key] = [None, None]  # выходной
             i += 1
 
         return dict_schedule
 
 
-class MegahandParserDataProcessor(Data):  # MegahandParser
-    list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
+class MegahandParserDataProcessor(DataProcessorBase):  # MegahandParser
     list_address = [
         ('Брикета', 'ул. Брикета, 2'),
         ('Лобанка', 'ул. Лобанка, 94, ТЦ "Maximus"'),
         ('Сурганова', 'ул. Сурганова, 57A, ТЦ "Европа"'),
-        ('Дунина-Марцинкевича', 'ул. Дунина-Марцинкевича, 11, ТЦ Раковский Кирмаш')
+        ('Дунина-Марцинкевича', 'ул. Дунина-Марцинкевича, 11, ТЦ "Раковский Кирмаш"')
                    ]
 
     def __init__(self):
-        self.__list_shops = list()
-        self.__megahand_data = dict()
+        DataProcessorBase.__init__(self)
         self.__exception_shares_90 = str()  # исключение работы магазина в день акции 90%
 
+    def get_network_name(self):
+        return 'Мегахенд'
+
     def get_parsing_results(self):
-        self.__megahand_data = MegahandParser().get_data()
-        for key, value in self.__megahand_data.items():
+        self._dict_raw_data_shops = MegahandParser().get_data()
+        for key, value in self._dict_raw_data_shops.items():
             address = self.get_address(key)
             dict_schedule = self.get_schedule(value[-1].text)
             dict_discounts = self.get_discount(value[:-1])
             if self.__exception_shares_90:
                 dict_schedule = self.update_special_day(dict_schedule, dict_discounts, self.__exception_shares_90)
-            self.__list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
+            self._list_shops.append(ShopsData(address, dict_schedule, dict_discounts))
             print(f'<<{address}>>')
             for key, value in dict_schedule.items():
                 print(key, value)
             for key, value in dict_discounts.items():
                 print(key, value)
-        return self.__list_shops
+        return self._list_shops
 
     def get_address(self, address):
         for i in self.list_address:
@@ -337,7 +346,7 @@ class MegahandParserDataProcessor(Data):  # MegahandParser
         dict_schedule = dict()
 
         for i in range(7):
-            dict_schedule[self.list_week[i]] = Data.convert_to_datetime(self, start_finish_time.group(1), start_finish_time.group(2), i)
+            dict_schedule[self.list_week[i]] = DataProcessorBase.convert_to_datetime(self, start_finish_time.group(1), start_finish_time.group(2), i)
 
         return dict_schedule
 
@@ -347,7 +356,7 @@ class MegahandParserDataProcessor(Data):  # MegahandParser
         for key, value in dict_discounts.items():
             for j in value:
                 if '90%' in j:
-                    dict_schedule[key] = Data.convert_to_datetime(self, start_finish.group(1), start_finish.group(2), day_counter)
+                    dict_schedule[key] = DataProcessorBase.convert_to_datetime(self, start_finish.group(1), start_finish.group(2), day_counter)
             day_counter += 1
 
         return dict_schedule

@@ -11,30 +11,32 @@
 {% endblock %}
 
 {% block content %}
-<table class="text" >
-  <tr>
-      <td>
-          <div style="text-center w-100">
-              <h3>{{ store.name_store }} {{ store.name_rating }}</h3>
-              <p>{{ store.city }}, {{ store.address }}</p>
-              {% for inf in store.list_days_open_hours %}
-                    <p>{{ inf }}</p>
+<div>
+    <div style="text-center w-50">
+        <h3>{{ store.name_store }} {{ store.name_rating }}</h3>
+        <p>{{ store.city }}, {{ store.address }}</p>
+        {% for inf in store.list_days_open_hours %}
+            <p>{{ inf }}</p>
               {% endfor %}
-              <hr>
           </div>
-          <div>
-              <ul class="hr">
-              {% for inf in store.list_promotion_days %}
-              <li>{{ inf }}</li>
-              {% endfor %}
-              </ul>
-          </div>
-      </td>
-      <td class="rightcol">
-          <div class="text">
-              <h2>Фото</h2>
-          </div>
-      </td>
-  </tr>
-</table>
+</div>
+<div class="=container">
+    <div class="row">
+    {% for inf in store.list_week %}
+        <div class="col-sm">
+            <h3>{{ inf }}</h3>
+        </div>
+    {% endfor %}
+    </div>
+    <hr>
+    <div class="row">
+    {% for inf in store.list_promotion_days %}
+        <div class="col-sm">
+            {% for price in inf %}
+                <h6>{{ price }}</h6>
+             {% endfor %}
+        </div>
+    {% endfor %}
+    </div>
+</div>
 {% endblock %}

@@ -1,13 +1,7 @@
-from datetime import datetime
-import datetime
-week_number = datetime.datetime.today().isocalendar()[1]
-print(week_number, 'ert')
-
-from datetime import datetime
-cur = datetime.now()
-d = datetime.isoweekday(cur)
-print(d)
-
+import requests
+from bs4 import BeautifulSoup as BS
+import re
+from datetime import datetime, date, timedelta
 second_hands = {
     'Мода Макс': 28,
     'Эконом сити': 20,
@@ -79,3 +73,19 @@ second_hands = {
     'Modenstoking': 1,
     'Second24.by': 1,
 }
+
+
+
+
+
+# s = 'AC/DCAC/DCAC/DCAC/DCAC/DCAC/DCAC/DCAC/DC'
+# resul = re.match('AC', s)  # ищет текст только в начале строки (0,2)
+# resul_1 = re.search('DC', s)  # ищет первое вхождение строки (3,5)
+# resul_2 = re.findall('DC', s)  # выводит список всех 'DC' элементов которые вошли в строку
+# resul_3 = re.split('/', s, maxsplit=3)  # заменяет '/' запятой, maxsplit=3 заменяет только первые 3 слеша
+# resul_4 = re.sub('AC', 'ss', s)  # заменяет 'AC' на 'DC'
+# resul_5 = re.fullmatch('AC', s)  # проверяет совпадает ли 'AC' со строкой s
+
+# .find() вытягивает данные из первого попавшегося тега
+# .find_all() забирает все подходящие элементы
+# #

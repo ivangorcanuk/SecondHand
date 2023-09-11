@@ -70,7 +70,10 @@ class EconomCityParser:
     def get_data(self):
         self.__dikt_url_minsk_shops = self.__get_url_all_shops_network()
         dict_shops_data = dict()
+        i = 0
         for key, value in self.__dikt_url_minsk_shops.items():
+            #if i < 1:
+            i += 1
             req = requests.get(value, headers=self.headers)
             soup = BS(req.content, 'lxml')
             open_hours = soup.find(class_="shopMap__info-description")
@@ -111,12 +114,11 @@ class AdzenneParser:
         self.__dikt_url_minsk_shops = self.__get_url_all_shops_network()
         dict_shop_data = dict()
         for key, value in self.__dikt_url_minsk_shops.items():
-            print(key, value)
-            req1 = requests.get(value, headers=self.headers)
-            soup1 = BS(req1.content, 'lxml')
-            calendar_block = soup1.find('table', class_="simcal-calendar-grid")
+            req = requests.get(value, headers=self.headers)
+            soup = BS(req.content, 'lxml')
+            calendar_block = soup.find('table', class_="simcal-calendar-grid")
             list_all_days = calendar_block.find_all("td")
-            all_calendar = soup1.find('div', class_="wpb_wrapper")
+            all_calendar = soup.find('div', class_="wpb_wrapper")
             work_time = re.search(r'Крама працуе:\n*(.+\n*.*)\n*Прыпынак', all_calendar.text)
             list_all_days.append(work_time.group(1))
             dict_shop_data[key] = list_all_days

@@ -49,7 +49,7 @@ class Store:
             if date.today() == day[0].date():
                 start_str = datetime.strptime(str(day[0].time()), "%H:%M:%S").strftime("%H:%M")
                 finish_str = datetime.strptime(str(day[1].time()), "%H:%M:%S").strftime("%H:%M")
-                print(start_str + ' - ' + finish_str)
+                #print(start_str + ' - ' + finish_str)
                 return start_str + ' - ' + finish_str
         return 'Выходной'
 
@@ -91,8 +91,8 @@ class Store:
 
         for i in range(len(list_days_open_hours)):
             list_days_open_hours[i] = list_days_open_hours[i].replace('00:00 - 00:00', 'Выходной')
-        for schedule in list_days_open_hours:
-            print(schedule)
+        # for schedule in list_days_open_hours:
+        #     print(schedule)
 
         return list_days_open_hours
 
@@ -108,6 +108,6 @@ class Store:
                     promotion = PromotionsRegister.objects.get(id=int(j))
                     list_promotion.append(promotion.promotion_name)
             list_temp.append(tuple(list_promotion))
-        for i in list_temp:
-            print(i)
+        # for i in list_temp:
+        #     print(i)
         return list_temp

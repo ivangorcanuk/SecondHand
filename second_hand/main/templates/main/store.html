@@ -11,15 +11,22 @@
 {% endblock %}
 
 {% block content %}
-<div>
-    <div style="text-center w-50">
-        <h3>{{ store.name_store }} {{ store.name_rating }}</h3>
-        <p>{{ store.city }}, {{ store.address }}</p>
-        {% for inf in store.list_days_open_hours %}
-            <p>{{ inf }}</p>
-              {% endfor %}
-          </div>
+<div class="=container">
+    <div class="row">
+        <div class="col-sm">
+            <br>
+            <h1>{{ store.name_store }} {{ store.name_rating }}</h1>
+            <h4>{{ store.city }}, {{ store.address }}</h4>
+            {% for inf in store.list_days_open_hours %}
+                <h4>{{ inf }}</h4>
+                  {% endfor %}
+        </div>
+        <div class="col-sm">
+            <img src="{{ img.img.image.url }}" height="400" width="600">
+        </div>
+    </div>
 </div>
+<br>
 <div class="=container">
     <div class="row">
     {% for inf in store.list_week %}

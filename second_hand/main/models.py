@@ -24,6 +24,10 @@ class LinkSocNetworks(models.Model):  # ссылки на соц сети и о�
     name_network = models.ForeignKey(StoreNetwork, on_delete=models.CASCADE, null=True)  # id сети магазинов
 
 
+class Gallery(models.Model):
+    image = models.FileField(upload_to='shop_gallery')
+
+
 class OpenHours(models.Model):  # рабочее время
     mon_st = models.DateTimeField(null=True, blank=True)
     mon_fn = models.DateTimeField(null=True, blank=True)
@@ -42,15 +46,6 @@ class OpenHours(models.Model):  # рабочее время
 
     def __str__(self):
         return f'{self.id}'
-
-
-# class GeneralPromotions(models.Model):
-#     name = models.CharField(max_length=50)
-#     value = models.IntegerField(null=True, blank=True)
-#     decoding = models.TextField(null=True, blank=True)
-#
-#     def __str__(self):
-#         return f'{self.name}'
 
 
 class PromotionsRegister(models.Model):  # все возможные акции и их процентное соотношение
@@ -88,6 +83,7 @@ class Stores(models.Model):  # магазины
     store_network = models.ForeignKey(StoreNetwork, on_delete=models.CASCADE, null=True, blank=True)  # id сети магазинов которой он принадлежит
     open_hours = models.ForeignKey(OpenHours, on_delete=models.CASCADE, null=True, blank=True)  # id времени работы
     promotion_days = models.ForeignKey(PromotionDays, on_delete=models.CASCADE, null=True, blank=True)  # id скидок
+    img = models.ForeignKey(Gallery, on_delete=models.PROTECT, null=True, blank=True)  # id скидок
     #slug = models.SlugField(default='', null=False)
 
     def __str__(self):

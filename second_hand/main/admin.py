@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, PromotionDays, PromotionsRegister
+from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, PromotionDays, PromotionsRegister, Gallery
 
 
 @admin.register(StoreNetwork)
@@ -56,13 +56,13 @@ class PromotionDays(admin.ModelAdmin):
         return f'{self.week_number}'
 
 
-# @admin.register(GeneralPromotions)
-# class GeneralPromotions(admin.ModelAdmin):
-#     list_display = ['id', 'name', 'value', 'decoding']
-#     #list_editable = ['name', 'value', 'decoding']  # список изменения полей
-#
-#     def __str__(self):
-#         return f'{self.name} - {self.value} - {self.decoding}'
+@admin.register(Gallery)
+class Gallery(admin.ModelAdmin):
+    list_display = ['id', 'image']
+    #list_editable = ['name', 'value', 'decoding']  # список изменения полей
+
+    def __str__(self):
+        return f'{self.image}'
 
 
 @admin.register(PromotionsRegister)

@@ -159,7 +159,7 @@ class MegahandParser:
             for script in scripts_all:
                 script_str = str(script)
                 if 'var data' in script_str:
-                    script_calendar = script_str[script_str.index('['):script_str.index(']')+1]
+                    script_calendar = script_str[script_str.catalog('['):script_str.catalog(']')+1]
                     list_of_dictionaries = json.loads(script_calendar)
 
             info_blocks = soup.find_all(class_="top_shop_blok")

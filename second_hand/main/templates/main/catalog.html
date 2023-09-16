@@ -1,0 +1,101 @@
+{% extends 'main/base.html' %}
+
+{% load static %} <!-- добавили новую функциональность, теги css -->
+
+{% block css_additional %}
+    <link rel="stylesheet" href="{% static 'css/catalog.css' %}"> <!-- rel указывает тип документа, который хотим подгрузить, "stylesheet" - css -->
+{% endblock %}
+
+{% block title %}
+Каталог
+{% endblock %}
+
+{% block content %}
+<div class="=container">
+    <div class="row">
+        {% for discount in list_social_discounts %}
+            <div class="col-sm">
+                <h6>{{ discount }}</h6>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+<hr>
+<div class="=container">
+    <div class="row">
+        <div class="col-sm width=200">
+            <form action="" method="get">
+                <div>
+                    <h6>Город</h6>
+                        <select id="fruits" name="fruits">
+                            {% for city in cities %}
+                              <option value="{{ city }}">{{ city }}</option>
+                            {% endfor %}
+                        </select>
+                </div>
+                <br>
+                <div>
+                    <h6>Сеть магазина</h6>
+                        <input type="checkbox" id="vehicle1" name="store_network" value="{{ name_network.0 }}">
+                        <label for="vehicle1">{{ name_network.0 }}</label><br>
+                        <input type="checkbox" id="vehicle2" name="store_network" value="{{ name_network.1 }}">
+                        <label for="vehicle2">{{ name_network.1 }}</label><br>
+                        <input type="checkbox" id="vehicle3" name="store_network" value="{{ name_network.2 }}">
+                        <label for="vehicle3">{{ name_network.2 }}</label><br>
+                        <input type="checkbox" id="vehicle4" name="store_network" value="{{ name_network.3 }}">
+                        <label for="vehicle4">{{ name_network.3 }}</label>
+                </div>
+                <br>
+                <div>
+                    <h6>Размер магазина</h6>
+                        <input type="checkbox" id="size1" name="shop_size" value="{{ sizes.0 }}">
+                        <label for="vehicle1">{{ sizes.0 }}</label><br>
+                        <input type="checkbox" id="size2" name="shop_size" value="{{ sizes.1 }}">
+                        <label for="vehicle2">{{ sizes.1 }}</label><br>
+                        <input type="checkbox" id="size3" name="shop_size" value="{{ sizes.2 }}">
+                        <label for="vehicle3">{{ sizes.2 }}</label><br>
+                </div>
+                <br>
+                <div>
+                    <h6>Скидки</h6>
+                        <select id="sales" name="sales">
+                            {% for sale in sales %}
+                              <option value="{{ sale }}">{{ sale }}</option>
+                            {% endfor %}
+                        </select>
+                </div>
+                <br>
+                <div>
+                    <h6>Акции</h6>
+                        <select id="discounts" name="discounts">
+                            {% for discount in discounts %}
+                              <option value="{{ discount }}">{{ discount }}</option>
+                            {% endfor %}
+                        </select>
+                </div>
+                <br>
+                <div>
+                    <h6>Дата</h6>
+                        <input type="date">
+                </div>
+                <br>
+                <div>
+                    <input type="submit" value="Submit">
+                </div>
+            </form>
+        </div>
+        <div class="col-sm">
+            <br>
+            <br>
+            {% for inf in list_shop_presentation %}
+                <h3><a href="{% url 'store' inf.id %}">{{ inf.name_store }} {{ inf.name_rating }}</a></h3>
+                <p>{{ inf.city }}, {{ inf.address }}</p>
+                <p>{{ inf.opening_hours_today_text }}</p>
+                <p>{{ inf.discount_today.promotion_name }}</p>
+                <hr>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

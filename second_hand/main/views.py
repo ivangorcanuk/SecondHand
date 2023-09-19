@@ -23,17 +23,7 @@ def index(request):
     return render(request, 'main/index.html')
 
 
-def catalog(request):
-    list_shop_presentation = list()  # список представления магазинов
-    form = SearchForm(request.POST)
-
-    base_shop = Stores.objects.all()
-    for store in base_shop:  # прошлись по таблице с магазинами и отправили данные в класс представления
-        #print(store.address)
-        st = Store(store.id, store.name_store, store.country, store.city, store.address,
-                   store.number_phone, store.number_stars, store.rating,
-                   store.store_network, store.open_hours, store.promotion_days)
-        list_shop_presentation.append(st)
+class Catalog:
 
     list_discounts = list()
     base_sale = PromotionsRegister.objects.values_list('general_promotions', flat=True)
@@ -43,51 +33,89 @@ def catalog(request):
     list_discounts = list(set(list_discounts))
 
     data = {
-        'form': form,
-        'list_shop_presentation': list_shop_presentation,
         'name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
         'cities': ['Минск'],
         'sizes': ['S', 'M', 'L'],
         'sales': ['-20%', '-40%', '-60%', '-80%'],
         'discounts': list_discounts,
         'list_social_discounts': ['Пенсионерам', 'Студентам', 'Детям', 'Семейные', 'На всё от 80%'],
+        'this_day': datetime.strftime(date.today(), "%d.%m.%Y"),
+        'search': '',
     }
 
-    if request.method == 'POST':
-        if form.is_valid():
-            name = request.POST['search']
-            list_stor = Stores.objects.filter(Q(name_store__icontains=name) | Q(address__icontains=name))
-            list_shop_presentation = list()
-            for store in list_stor:
-                st = Store(store.id, store.name_store, store.country, store.city, store.address,
-                           store.number_phone, store.number_stars, store.rating,
-                           store.store_network, store.open_hours, store.promotion_days)
-                list_shop_presentation.append(st)
+    def catalog(self, request):
+        base_shop = Stores.objects.all()
+        self.data['list_shop_presentation'] = self.stor(base_shop)
+        self.data['search'] = ''
+        return render(request, 'main/catalog.html', context=self.data)
 
-            data['list_shop_presentation'] = list_shop_presentation
+    def search(self, request):
+        if request.method == 'GET':
+            if request.GET.get('search') is not None:
+                search = request.GET.get('search')
+                self.data['search'] = search
+                list_stor = Stores.objects.filter(Q(name_store__icontains=search) | Q(address__icontains=search))
+                if list_stor is not None:
+                    list_shop_presentation = list()
+                    for store in list_stor:
+                        st = Store(store.id, store.name_store, store.country, store.city, store.address,
+                                   store.number_phone, store.number_stars, store.rating,
+                                   store.store_network, store.open_hours, store.promotion_days)
+                        list_shop_presentation.append(st)
 
-            return render(request, 'main/catalog.html', context=data)
+                    self.data['list_shop_presentation'] = list_shop_presentation
 
-    if request.method == 'GET':
-        print('asd')
-        print(request.GET.get('fruits'))
-        print(request.GET.get('store_network'))
-        print(request.GET.get('shop_size'))
-        print(request.GET.get('sales'))
-        print(request.GET.get('discounts'))
-        # list_stor = Stores.objects.filter(Q(name_store__icontains=name) | Q(address__icontains=name))
-        # list_shop_presentation = list()
-        # for store in list_stor:
-        #     st = Store(store.id, store.name_store, store.country, store.city, store.address,
-        #                store.number_phone, store.number_stars, store.rating,
-        #                store.store_network, store.open_hours, store.promotion_days)
-        #     list_shop_presentation.append(st)
-        #
-        # data['list_shop_presentation'] = list_shop_presentation
-        #
-        # return render(request, 'main/catalog.html', context=data)
+                    return render(request, 'main/catalog.html', context=self.data)
+                else:
+                    return render(request, 'main/catalog.html', context=self.data)
 
-    return render(request, 'main/catalog.html', context=data)
+    def filter(self, request):
+        if request.method == 'GET':
+            print(request.GET.get('city'))
+            print(request.GET.getlist('store_network'))
+            print(request.GET.getlist('shop_size'))
+            print(request.GET.get('sales'))
+            print(request.GET.get('discounts'))
+            print(request.GET.get('date'))
+            shops_one_city = None
+            list_shops = list()
+            list_store_network = request.GET.get('store_network')
+            if list_store_network:  # если заполнен
+                for network in list_store_network:
+                    list_temp = Stores.objects.filter(name_store__icontains=network)
+                    list_shops += list_temp
+                self.data['list_shop_presentation'] = self.stor(list_shops)
+                return render(request, 'main/catalog.html', context=self.data)
+            else:
+                return render(request, 'main/catalog.html', context=self.data)
+            # if request.GET.get('city') is not None:  # установить постоянное значение
+            #     city = request.GET.get('city')
+            #     list_stor = Stores.objects.filter(city__icontains=city)
+            # if request.GET.get('store_network') is not None:  # установить постоянное значение
+            #     network = request.GET.get('store_network')
+            #     list_stor = Stores.objects.filter(name_store__icontains=network)
+            # if request.GET.get('shop_size') is not None:  # установить постоянное значение
+            #     size = request.GET.get('shop_size')
+            #     list_stor = Stores.objects.filter(size__icontains=size)
+            # if request.GET.get('sales') is not None:  # установить постоянное значение
+            #     sale = request.GET.get('sales')
+            #     # искать в структуре класса
+            # if request.GET.get('discounts') is not None:  # установить постоянное значение
+            #     discount = request.GET.get('discounts')
+            #     # искать в структуре класса
+            # if request.GET.get('date') is not None:  # установить постоянное значение
+            #     date = request.GET.get('date')
+                # подумать
+
+    def stor(self, base_shop):
+        list_shop_presentation = list()
+        for store in base_shop:  # прошлись по таблице с магазинами и отправили данные в класс представления
+            st = Store(store.id, store.name_store, store.country, store.city, store.address,
+                       store.number_phone, store.number_stars, store.rating,
+                       store.store_network, store.open_hours, store.promotion_days)
+            list_shop_presentation.append(st)
+        return list_shop_presentation
+
 
 
 # class Index(ListView):
@@ -130,19 +158,20 @@ def map(request):
 #         return context
 
 
-def stor(request, id_store: int):
-    # a = ShopsDataController()
-    # a.start()
+class Stor:
+    def stor(self, request, id_store: int):
+        # a = ShopsDataController()
+        # a.start()
 
-    id_store = Stores.objects.get(id=id_store)
-    store = Store(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.address,
-                  id_store.number_phone, id_store.number_stars, id_store.rating,
-                  id_store.store_network, id_store.open_hours, id_store.promotion_days)
-    data = {
-        'store': store,
-        'img': id_store,
-    }
-    return render(request, 'main/store.html', context=data)
+        id_store = Stores.objects.get(id=id_store)
+        store = Store(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.address,
+                      id_store.number_phone, id_store.number_stars, id_store.rating,
+                      id_store.store_network, id_store.open_hours, id_store.promotion_days)
+        data = {
+            'store': store,
+            'img': id_store,
+        }
+        return render(request, 'main/store.html', context=data)
 
 
 def all_shop(request):

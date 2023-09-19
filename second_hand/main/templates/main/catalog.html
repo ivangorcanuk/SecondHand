@@ -24,10 +24,10 @@
 <div class="=container">
     <div class="row">
         <div class="col-sm width=200">
-            <form action="" method="get">
+            <form action="{% url 'filter' %} " method="get">
                 <div>
                     <h6>Город</h6>
-                        <select id="fruits" name="fruits">
+                        <select id="fruits" name="city">
                             {% for city in cities %}
                               <option value="{{ city }}">{{ city }}</option>
                             {% endfor %}
@@ -48,11 +48,11 @@
                 <br>
                 <div>
                     <h6>Размер магазина</h6>
-                        <input type="checkbox" id="size1" name="shop_size" value="{{ sizes.0 }}">
+                        <input type="checkbox" id="size1" name="shop_size" value="{{ sizes.0 }}" checked>
                         <label for="vehicle1">{{ sizes.0 }}</label><br>
-                        <input type="checkbox" id="size2" name="shop_size" value="{{ sizes.1 }}">
+                        <input type="checkbox" id="size2" name="shop_size" value="{{ sizes.1 }}" checked>
                         <label for="vehicle2">{{ sizes.1 }}</label><br>
-                        <input type="checkbox" id="size3" name="shop_size" value="{{ sizes.2 }}">
+                        <input type="checkbox" id="size3" name="shop_size" value="{{ sizes.2 }}" checked>
                         <label for="vehicle3">{{ sizes.2 }}</label><br>
                 </div>
                 <br>
@@ -76,11 +76,11 @@
                 <br>
                 <div>
                     <h6>Дата</h6>
-                        <input type="date">
+                        <input type="date"  id="date1" name="date" value="this_day">
                 </div>
                 <br>
                 <div>
-                    <input type="submit" value="Submit">
+                    <button type="submit">Применить</button>
                 </div>
             </form>
         </div>
@@ -88,7 +88,7 @@
             <br>
             <br>
             {% for inf in list_shop_presentation %}
-                <h3><a href="{% url 'store' inf.id %}">{{ inf.name_store }} {{ inf.name_rating }}</a></h3>
+                <h5><a href="{% url 'store' inf.id %}">{{ inf.name_store }} {{ inf.name_rating }}</a></h5>
                 <p>{{ inf.city }}, {{ inf.address }}</p>
                 <p>{{ inf.opening_hours_today_text }}</p>
                 <p>{{ inf.discount_today.promotion_name }}</p>

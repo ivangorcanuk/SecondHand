@@ -95,6 +95,7 @@ class EconomCityParserDataProcessor(DataProcessorBase):
     def get_parsing_results(self):
         self._dict_raw_data_shops = EconomCityParser().get_data()
         for key, value in self._dict_raw_data_shops.items():
+            print(key)
             dict_schedule = self.get_schedule(value[-1].text)
             dict_discounts = self.get_discount(value[:-1])
             if self.__exception_full_change:
@@ -102,7 +103,6 @@ class EconomCityParserDataProcessor(DataProcessorBase):
             if self.__exception_all_by_3:
                 dict_schedule = self.update_special_day(dict_schedule, dict_discounts, self.__exception_all_by_3)
             self._list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
-            print(key)
             for key, value in dict_schedule.items():
                 print(key, value)
             for key, value in dict_discounts.items():
@@ -136,11 +136,14 @@ class EconomCityParserDataProcessor(DataProcessorBase):
 
     def get_schedule(self, schedule_raw):
 
-        without_enter_schedule = re.search(r'(.*\n*.+)\nВ день полной', schedule_raw)
+        without_enter_schedule = re.search(r'(.+\s*Вс.\s*\d*.\d*.+\d*.\d)', schedule_raw)
         without_enter_schedule = without_enter_schedule.group(1).replace('\r', '')
-        without_enter_schedule = without_enter_schedule.split('\n')
-        without_enter_schedule = without_enter_schedule[0] + without_enter_schedule[1]
+        if '\n' in without_enter_schedule:
+            list_without_enter_schedule = without_enter_schedule.split('\n')
+            without_enter_schedule = list_without_enter_schedule[0] + list_without_enter_schedule[1]
         converted_timetable = without_enter_schedule.replace(' :', ':')
+        converted_timetable = converted_timetable.replace('\xa0', '')
+        converted_timetable = converted_timetable.replace(',', '')
         if 'В день полной' in schedule_raw:
             temp_time_full_change = re.search(r'В день полной\D*(\d*.\d*\s*.\s*\d*.\d*)', schedule_raw)
             self.__exception_full_change = temp_time_full_change.group(1)
@@ -148,6 +151,7 @@ class EconomCityParserDataProcessor(DataProcessorBase):
         if 'В день акции' in schedule_raw:
             temp_time_all_by_3 = re.search(r'В день акции.*(\d\d.\d\d\s*.\s*\d\d.\d\d)', schedule_raw)
             self.__exception_all_by_3 = temp_time_all_by_3.group(1)
+        print([converted_timetable])
 
         return DataProcessorBase.get_schedule(self, converted_timetable)
 

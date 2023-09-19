@@ -11,10 +11,10 @@ class ShopsDataController:
         self.dict_shops = dict()
 
     def start(self):
-        self.dict_shops[self.mmx_data_processor.get_network_name()] = self.mmx_data_processor.get_parsing_results()
+        #self.dict_shops[self.mmx_data_processor.get_network_name()] = self.mmx_data_processor.get_parsing_results()
         self.dict_shops[self.ec_data_processor.get_network_name()] = self.ec_data_processor.get_parsing_results()
-        self.dict_shops[self.ad_data_processor.get_network_name()] = self.ad_data_processor.get_parsing_results()
-        self.dict_shops[self.mh_data_processor.get_network_name()] = self.mh_data_processor.get_parsing_results()
+        #self.dict_shops[self.ad_data_processor.get_network_name()] = self.ad_data_processor.get_parsing_results()
+        #self.dict_shops[self.mh_data_processor.get_network_name()] = self.mh_data_processor.get_parsing_results()
         self.data_save()
 
     def data_save(self):

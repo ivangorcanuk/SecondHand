@@ -67,21 +67,23 @@ class ModaMaxParserDataProcessor(DataProcessorBase):
                 print(key, value)
             for key, value in dict_discounts.items():
                 print(key, value)
-        print('ASD')
         return self._list_shops
 
     def get_discount(self, many_descaunt):
         dict_ = dict()
         for i in range(len(many_descaunt)):
             many = re.search(r'^\S*\s*(\S+)\s*(\d+)\s*(\d+)\s*(.*)\n\ *\s*(.*)\s*', many_descaunt[i].text)
-            dict_[many.group(1).capitalize()] = [many.group(2) + '.' + many.group(3), many.group(4), many.group(5)]
+            if many is not None:
+                dict_[self.list_week[i]] = [many.group(2) + '.' + many.group(3), many.group(4), many.group(5)]
+            else:
+                dict_[self.list_week[i]] = ['']
         return dict_
 
 
 class EconomCityParserDataProcessor(DataProcessorBase):
     list_discount = ['20%', '30%', '40%', '50%', '60%', '70%', '80%', 'День сеньора', '3я вещь в подарок',
-                     'Большое пополнение', 'Всё по 3 рубля', 'Полна смена товара', 'Детский день', 'Текстиль',
-                     'Товар премиум', 'x2 скидка по дисконту', '4я вещь в подарок', 'Пополнение товара',
+                     'Большое пополнение', 'Всё по 4 рубля', 'Полная смена товара', 'Детский день',
+                     'Текстиль', 'Товар премиум', 'x2 скидка по дисконту', '4я вещь в подарок', 'Пополнение товара',
                      'Большое поступление', 'Винтаж', 'Обувь']
 
     def __init__(self):

@@ -2,11 +2,11 @@ from .models import PromotionsRegister, StoreNetwork, Stores, LinkSocNetworks, O
 from datetime import datetime, date
 
 
-class Store:
+class StoreViewItem:
     list_week = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс']
 
     def __init__(self, id_store, name_store, country, city, address, number_phone,
-                 number_stars, rating, store_network, open_hours, promotion_days):
+                 number_stars, rating, size, store_network, open_hours, promotion_days, img):
         self.id = id_store
         self.name_store = name_store
         self.country = country
@@ -15,7 +15,9 @@ class Store:
         self.number_phone = number_phone
         self.number_stars = number_stars
         self.rating = rating
+        self.size = size
         self.store_network = store_network
+        self.img = img
         self.list_open_hours = [
                         [open_hours.mon_st, open_hours.mon_fn],
                         [open_hours.tue_st, open_hours.tue_fn],
@@ -43,6 +45,7 @@ class Store:
         self.opening_hours_today_text = self.get_todays_open_hours()  # готовая строка для отображения рабочего времени
         self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
         self.list_promotion_days = self.get_promotion_list_by_id()
+        self.list_catalog_prom_days = self.list_promotion_days[datetime.weekday(date.today()):len(self.list_promotion_days)]
 
     def get_todays_open_hours(self):
         for day in self.list_open_hours:

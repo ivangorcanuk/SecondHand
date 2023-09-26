@@ -80,6 +80,7 @@ class Stores(models.Model):  # магазины
     number_phone = models.IntegerField()  # номер телефона магазина
     number_stars = models.IntegerField(null=True, blank=True)  # количество звезд оставленных подьзователями
     rating = models.FloatField(null=True, blank=True)
+    size = models.CharField(max_length=1, null=True, blank=True)
     store_network = models.ForeignKey(StoreNetwork, on_delete=models.CASCADE, null=True, blank=True)  # id сети магазинов которой он принадлежит
     open_hours = models.ForeignKey(OpenHours, on_delete=models.CASCADE, null=True, blank=True)  # id времени работы
     promotion_days = models.ForeignKey(PromotionDays, on_delete=models.CASCADE, null=True, blank=True)  # id скидок

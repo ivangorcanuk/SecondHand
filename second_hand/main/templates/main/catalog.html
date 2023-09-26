@@ -15,85 +15,99 @@
     <div class="row">
         {% for discount in list_social_discounts %}
             <div class="col-sm">
-                <h6>{{ discount }}</h6>
+                <h4><a href="{% url 'pensioner' discount %}">{{ discount }}</a></h4>
             </div>
         {% endfor %}
     </div>
 </div>
 <hr>
-<div class="=container">
-    <div class="row">
-        <div class="col-sm width=200">
-            <form action="{% url 'filter' %} " method="get">
-                <div>
-                    <h6>Город</h6>
-                        <select id="fruits" name="city">
-                            {% for city in cities %}
-                              <option value="{{ city }}">{{ city }}</option>
+<div class="header">
+    <div class="=container">
+        <div class="row">
+            <div class="col-sm">
+                <form action="{% url 'filter' %} " method="get">
+                    <div>
+                        <h6>Город</h6>
+                            <select id="fruits" name="city">
+                                {% for city in cities %}
+                                  <option value="{{ city }}">{{ city }}</option>
+                                {% endfor %}
+                            </select>
+                    </div>
+                    <br>
+                    <div>
+                        <h6>Сеть магазина</h6>
+                            {% for name_network in list_name_network %}
+                                <input type="checkbox" id="network1" name="store_network" value="{{ name_network }}" {% if name_network in network %} checked {% endif %}>
+                                <label for="network1" >{{ name_network }}</label><br>
                             {% endfor %}
-                        </select>
-                </div>
-                <br>
-                <div>
-                    <h6>Сеть магазина</h6>
-                        <input type="checkbox" id="vehicle1" name="store_network" value="{{ name_network.0 }}">
-                        <label for="vehicle1">{{ name_network.0 }}</label><br>
-                        <input type="checkbox" id="vehicle2" name="store_network" value="{{ name_network.1 }}">
-                        <label for="vehicle2">{{ name_network.1 }}</label><br>
-                        <input type="checkbox" id="vehicle3" name="store_network" value="{{ name_network.2 }}">
-                        <label for="vehicle3">{{ name_network.2 }}</label><br>
-                        <input type="checkbox" id="vehicle4" name="store_network" value="{{ name_network.3 }}">
-                        <label for="vehicle4">{{ name_network.3 }}</label>
-                </div>
-                <br>
-                <div>
-                    <h6>Размер магазина</h6>
-                        <input type="checkbox" id="size1" name="shop_size" value="{{ sizes.0 }}" checked>
-                        <label for="vehicle1">{{ sizes.0 }}</label><br>
-                        <input type="checkbox" id="size2" name="shop_size" value="{{ sizes.1 }}" checked>
-                        <label for="vehicle2">{{ sizes.1 }}</label><br>
-                        <input type="checkbox" id="size3" name="shop_size" value="{{ sizes.2 }}" checked>
-                        <label for="vehicle3">{{ sizes.2 }}</label><br>
-                </div>
-                <br>
-                <div>
-                    <h6>Скидки</h6>
-                        <select id="sales" name="sales">
-                            {% for sale in sales %}
-                              <option value="{{ sale }}">{{ sale }}</option>
+                    </div>
+                    <br>
+                    <div>
+                        <h6>Размер магазина</h6>
+                            {% for siz in list_sizes %}
+                                <input type="checkbox" id="siz1" name="shop_size" value="{{ siz }}" {% if siz in size %} checked {% endif %}>
+                                <label for="siz1">{{ siz }}</label><br>
                             {% endfor %}
-                        </select>
-                </div>
-                <br>
-                <div>
-                    <h6>Акции</h6>
-                        <select id="discounts" name="discounts">
-                            {% for discount in discounts %}
-                              <option value="{{ discount }}">{{ discount }}</option>
-                            {% endfor %}
-                        </select>
-                </div>
-                <br>
-                <div>
-                    <h6>Дата</h6>
-                        <input type="date"  id="date1" name="date" value="this_day">
-                </div>
-                <br>
-                <div>
-                    <button type="submit">Применить</button>
-                </div>
-            </form>
-        </div>
-        <div class="col-sm">
+                    </div>
+                    <br>
+                    <div>
+                        <h6>Скидки</h6>
+                            <select id="sales" name="sales">
+                                <option selected="selected">{{ sale }}</option>
+                                {% for sale in sales %}
+                                    <option value="{{ sale }}">{{ sale }}</option>
+                                {% endfor %}
+                            </select>
+                    </div>
+                    <br>
+                    <div>
+                        <h6>Акции</h6>
+                            <select id="discounts" name="discount">
+                                  <option selected="selected">{{ discount }}</option>
+                                  {% for discount in discounts %}
+                                      <option value="{{ discount }}">{{ discount }}</option>
+                                  {% endfor %}
+                            </select>
+                    </div>
+                    <br>
+                    <div>
+                        <h6>Дата</h6>
+                            <input type="date"  id="date1" name="date" value="selected_date">
+                    </div>
+                    <br>
+                    <div>
+                        <button type="submit">Применить</button>
+                    </div>
+                </form>
+            </div>
             <br>
             <br>
-            {% for inf in list_shop_presentation %}
-                <h5><a href="{% url 'store' inf.id %}">{{ inf.name_store }} {{ inf.name_rating }}</a></h5>
-                <p>{{ inf.city }}, {{ inf.address }}</p>
-                <p>{{ inf.opening_hours_today_text }}</p>
-                <p>{{ inf.discount_today.promotion_name }}</p>
-                <hr>
-            {% endfor %}
+            <div class="col-sm">
+                {% for inf in list_shop_presentation %}
+                    <div class="list">
+                        <div class="indentation">
+                            <img src="{{ inf.img.image.url }}" height="100" width="120">
+                        </div>
+                        <div>
+                            <h5><a href="{% url 'store' inf.id %}">{{ inf.name_store }} {{ inf.name_rating }}</a></h5>
+                        </div>
+                    </div>
+                        <div class="city_and_address">
+                            <p>{{ inf.city }}, {{ inf.address }}</p>
+                        </div>
+                        <div class="size">
+                            <p>Размер магазина: {{ inf.size }}</p>
+                        </div>
+                        <div>
+                            <p>{{ inf.opening_hours_today_text }}</p>
+                        </div>
+                        <div>
+                            <p>{{ inf.list_catalog_prom_days }}</p>
+                        </div>
+                        <hr>
+                    {% endfor %}
+            </div>
         </div>
     </div>
 </div>

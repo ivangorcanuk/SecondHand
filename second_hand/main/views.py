@@ -6,7 +6,7 @@
 # DeleteView удалить запись
 from django.shortcuts import render
 from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, PromotionsRegister, PromotionDays, Gallery
-from .shop_introduction import Store
+from .shop_introduction import StoreViewItem
 from .shops_data_controller import ShopsDataController
 from django.views.generic import ListView
 import requests
@@ -33,89 +33,138 @@ class Catalog:
     list_discounts = list(set(list_discounts))
 
     data = {
-        'name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
+        'list_name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
         'cities': ['Минск'],
-        'sizes': ['S', 'M', 'L'],
-        'sales': ['-20%', '-40%', '-60%', '-80%'],
+        'list_sizes': ['S', 'M', 'L'],
+        'sales': ['-30%', '-40%', '-60%', '-80%'],
         'discounts': list_discounts,
         'list_social_discounts': ['Пенсионерам', 'Студентам', 'Детям', 'Семейные', 'На всё от 80%'],
-        'this_day': datetime.strftime(date.today(), "%d.%m.%Y"),
         'search': '',
+        'network': '',
+        'sale': 'Выберите скидку',
+        'discount': 'Выберите акцию',
+        'size': '',
+        'selected_date': '',
     }
 
+    def __init__(self):
+        self.base_shop = Stores.objects.all()
+        self.list_shops = self.convert_to_view_item(self.base_shop)
+        self.discounts = PromotionsRegister.objects.all()
+
     def catalog(self, request):
-        base_shop = Stores.objects.all()
-        self.data['list_shop_presentation'] = self.stor(base_shop)
+        self.data['list_shop_presentation'] = self.list_shops
         self.data['search'] = ''
+        self.data['network'] = ''
+        self.data['size'] = ''
+        self.data['selected_date'] = ''
         return render(request, 'main/catalog.html', context=self.data)
 
-    def search(self, request):
-        if request.method == 'GET':
-            if request.GET.get('search') is not None:
-                search = request.GET.get('search')
-                self.data['search'] = search
-                list_stor = Stores.objects.filter(Q(name_store__icontains=search) | Q(address__icontains=search))
-                if list_stor is not None:
-                    list_shop_presentation = list()
-                    for store in list_stor:
-                        st = Store(store.id, store.name_store, store.country, store.city, store.address,
-                                   store.number_phone, store.number_stars, store.rating,
-                                   store.store_network, store.open_hours, store.promotion_days)
-                        list_shop_presentation.append(st)
+    def handle_search(self, request):
+        if request.GET.get('search') is not None:
+            search_str = request.GET.get('search')
+            self.data['search'] = search_str
+            list_shop_presentation = list()
+            for shop in self.list_shops:
+                name_store = shop.name_store
+                address = shop.address
+                if search_str.upper() in name_store.upper() or search_str.upper() in address.upper():
+                    list_shop_presentation.append(shop)
+            self.data['list_shop_presentation'] = list_shop_presentation
+            return render(request, 'main/catalog.html', context=self.data)
 
-                    self.data['list_shop_presentation'] = list_shop_presentation
+    def handle_filtering(self, request):
+        list_shops_sorted = self.list_shops
+        shops_one_city = request.GET.get('city')
+        list_store_network = request.GET.getlist('store_network')
+        list_shop_size = request.GET.getlist('shop_size')
+        sale = request.GET.get('sales')
+        discount = request.GET.get('discount')
+        date_to_search = request.GET.get('date')
+        week_day = str()
 
-                    return render(request, 'main/catalog.html', context=self.data)
+        if list_store_network:  # если заполнен
+            list_shops_sorted = self.sort_by_shop_network(list_store_network, list_shops_sorted)
+
+        if list_shop_size:
+            list_shops_sorted = self.sort_by_shop_size(list_shop_size, list_shops_sorted)
+
+        if date_to_search:
+            week_day = str(date.weekday(date.today()))
+
+        if sale != 'Выберите скидку':
+            list_shops_sorted = self.processes_sale(list_shops_sorted, sale, week_day)
+
+        if discount != 'Выберите акцию':
+            list_shops_sorted = self.processes_sale(list_shops_sorted, discount, week_day)
+
+        self.data['list_shop_presentation'] = list_shops_sorted
+        self.data['network'] = list_store_network
+        self.data['sale'] = sale
+        self.data['discount'] = discount
+        self.data['size'] = list_shop_size
+        self.data['selected_date'] = date_to_search
+
+        return render(request, 'main/catalog.html', context=self.data)
+
+    def sort_by_shop_network(self, list_shops_network, list_shops_sorted):
+        list_temp = list()
+        for shop in list_shops_sorted:
+            if shop.name_store in list_shops_network:
+                list_temp.append(shop)
+        return list_temp
+
+    def sort_by_shop_size(self, list_shop_size, list_shops_sorted):
+        list_temp = list()
+        for shop in list_shops_sorted:
+            if shop.size in list_shop_size:
+                list_temp.append(shop)
+        return list_temp
+
+    def processes_sale(self, list_shops_sorted, discount, week_day):
+        discounts = PromotionsRegister.objects.filter(general_promotions=discount)
+        list_temp = list()
+        for i in discounts:
+            for stor in list_shops_sorted:
+                if week_day == '':
+                    for j in range(datetime.weekday(date.today()), len(stor.list_promotion)):
+                        list_id = stor.list_promotion[j].split('*')
+                        if str(i.id) in list_id:
+                            list_temp.append(stor)
                 else:
-                    return render(request, 'main/catalog.html', context=self.data)
+                    list_id = stor.list_promotion[int(week_day)].split('*')
+                    if str(i.id) in list_id:
+                        list_temp.append(stor)
+        return list_temp
 
-    def filter(self, request):
-        if request.method == 'GET':
-            print(request.GET.get('city'))
-            print(request.GET.getlist('store_network'))
-            print(request.GET.getlist('shop_size'))
-            print(request.GET.get('sales'))
-            print(request.GET.get('discounts'))
-            print(request.GET.get('date'))
-            shops_one_city = None
-            list_shops = list()
-            list_store_network = request.GET.get('store_network')
-            if list_store_network:  # если заполнен
-                for network in list_store_network:
-                    list_temp = Stores.objects.filter(name_store__icontains=network)
-                    list_shops += list_temp
-                self.data['list_shop_presentation'] = self.stor(list_shops)
-                return render(request, 'main/catalog.html', context=self.data)
-            else:
-                return render(request, 'main/catalog.html', context=self.data)
-            # if request.GET.get('city') is not None:  # установить постоянное значение
-            #     city = request.GET.get('city')
-            #     list_stor = Stores.objects.filter(city__icontains=city)
-            # if request.GET.get('store_network') is not None:  # установить постоянное значение
-            #     network = request.GET.get('store_network')
-            #     list_stor = Stores.objects.filter(name_store__icontains=network)
-            # if request.GET.get('shop_size') is not None:  # установить постоянное значение
-            #     size = request.GET.get('shop_size')
-            #     list_stor = Stores.objects.filter(size__icontains=size)
-            # if request.GET.get('sales') is not None:  # установить постоянное значение
-            #     sale = request.GET.get('sales')
-            #     # искать в структуре класса
-            # if request.GET.get('discounts') is not None:  # установить постоянное значение
-            #     discount = request.GET.get('discounts')
-            #     # искать в структуре класса
-            # if request.GET.get('date') is not None:  # установить постоянное значение
-            #     date = request.GET.get('date')
-                # подумать
-
-    def stor(self, base_shop):
+    def convert_to_view_item(self, base_shop):
         list_shop_presentation = list()
         for store in base_shop:  # прошлись по таблице с магазинами и отправили данные в класс представления
-            st = Store(store.id, store.name_store, store.country, store.city, store.address,
-                       store.number_phone, store.number_stars, store.rating,
-                       store.store_network, store.open_hours, store.promotion_days)
+            st = StoreViewItem(store.id, store.name_store, store.country, store.city, store.address,
+                               store.number_phone, store.number_stars, store.rating, store.size,
+                               store.store_network, store.open_hours, store.promotion_days, store.img)
             list_shop_presentation.append(st)
         return list_shop_presentation
 
+    def pensioners(self, request, discount: str):
+        dikt_similarity_discounts = {
+            'Пенсионерам': ['День сеньора', 'Социальная скидка'],
+            'Студентам': ['Скидка для студентов'],
+            'Детям': ['Детский день'],
+            'Семейные': ['3я вещь в подарок', '4я вещь в подарок'],
+            'На всё от 80%': ['-80%', '-85%', '-90%', '-95%', 'Всё по 1 рублю',
+                              'Всё по 2 рубля', 'Всё по 4 рубля', 'Всё по 4 рубля']
+        }
+        list_temp = list()
+        for promotion in self.discounts:
+            if promotion.general_promotions in dikt_similarity_discounts[discount]:
+                for shop in self.list_shops:
+                    for j in range(datetime.weekday(date.today()), len(shop.list_promotion)):
+                        list_id = shop.list_promotion[j].split('*')
+                        if str(promotion.id) in list_id:
+                            list_temp.append(shop)
+        self.data['list_shop_presentation'] = list_temp
+        return render(request, 'main/catalog.html', context=self.data)
 
 
 # class Index(ListView):
@@ -144,7 +193,11 @@ class Catalog:
 #         store.save()
 
 def map(request):
-    return render(request, 'main/map.html')
+    form = SearchForm()
+    date = {
+        'form': form
+    }
+    return render(request, 'main/map.html', context=date)
 
 
 # class Store(ListView):
@@ -164,9 +217,9 @@ class Stor:
         # a.start()
 
         id_store = Stores.objects.get(id=id_store)
-        store = Store(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.address,
-                      id_store.number_phone, id_store.number_stars, id_store.rating,
-                      id_store.store_network, id_store.open_hours, id_store.promotion_days)
+        store = StoreViewItem(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.address,
+                              id_store.number_phone, id_store.number_stars, id_store.rating, id_store.size,
+                              id_store.store_network, id_store.open_hours, id_store.promotion_days, id_store.img.image)
         data = {
             'store': store,
             'img': id_store,

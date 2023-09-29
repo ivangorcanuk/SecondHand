@@ -15,5 +15,6 @@ urlpatterns = [
     path('about', views.about, name='about'),
     path('news', views.news, name='news'),
     path('forum', views.forum, name='forum'),
+    path('sear', views.search, name='sear'),
     # path('', views.FeedbackView.as_view()),
 ]

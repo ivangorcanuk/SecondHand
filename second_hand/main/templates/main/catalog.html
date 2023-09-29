@@ -37,45 +37,33 @@
                     <br>
                     <div>
                         <h6>Сеть магазина</h6>
-                            {% for name_network in list_name_network %}
-                                <input type="checkbox" id="network1" name="store_network" value="{{ name_network }}" {% if name_network in network %} checked {% endif %}>
-                                <label for="network1" >{{ name_network }}</label><br>
-                            {% endfor %}
+                            {{ form_filters.checkbox_network_moda_max }}<label>{{ form_filters.checkbox_network_moda_max.label }}</label><br>
+                            {{ form_filters.checkbox_network_economy_city }}<label>{{ form_filters.checkbox_network_economy_city.label }}</label><br>
+                            {{ form_filters.checkbox_network_adzenne }}<label>{{ form_filters.checkbox_network_adzenne.label }}</label><br>
+                            {{ form_filters.checkbox_network_megahand }}<label>{{ form_filters.checkbox_network_megahand.label }}</label><br>
                     </div>
                     <br>
                     <div>
                         <h6>Размер магазина</h6>
-                            {% for siz in list_sizes %}
-                                <input type="checkbox" id="siz1" name="shop_size" value="{{ siz }}" {% if siz in size %} checked {% endif %}>
-                                <label for="siz1">{{ siz }}</label><br>
-                            {% endfor %}
+                            {{ form_filters.checkbox_size_S }}<label>{{ form_filters.checkbox_size_S.label }}</label><br>
+                            {{ form_filters.checkbox_size_M }}<label>{{ form_filters.checkbox_size_M.label }}</label><br>
+                            {{ form_filters.checkbox_size_L }}<label>{{ form_filters.checkbox_size_L.label }}</label><br>
                     </div>
                     <br>
                     <div>
                         <h6>Скидки</h6>
-                            <select id="sales" name="sales">
-                                <option selected="selected">{{ sale }}</option>
-                                {% for sale in sales %}
-                                    <option value="{{ sale }}">{{ sale }}</option>
-                                {% endfor %}
-                            </select>
+                            {{ form_filters.combobox_sales }}
                     </div>
                     <br>
                     <div>
                         <h6>Акции</h6>
-                            <select id="discounts" name="discount">
-                                  <option selected="selected">{{ discount }}</option>
-                                  {% for discount in discounts %}
-                                      <option value="{{ discount }}">{{ discount }}</option>
-                                  {% endfor %}
-                            </select>
+                            {{ form_filters.combobox_discounts }}
                     </div>
                     <br>
                     <div>
                         <h6>Дата</h6>
-                            <input type="date"  id="date1" name="date" value="selected_date">
+                            {{ form_filters.date }}<br><br>
                     </div>
-                    <br>
                     <div>
                         <button type="submit">Применить</button>
                     </div>

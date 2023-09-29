@@ -9,10 +9,11 @@ from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, Promotions
 from .shop_introduction import StoreViewItem
 from .shops_data_controller import ShopsDataController
 from django.views.generic import ListView
+from django.http import HttpResponseRedirect
 import requests
 import re
 from datetime import datetime, date, timedelta
-from .forms import SearchForm
+from .forms import SearchForm, FiltersForm, list_sales, list_discounts
 from django.db.models import Q
 
 # придумать хитрый механизм для отображения рабочего времени по дням недели!
@@ -23,29 +24,31 @@ def index(request):
     return render(request, 'main/index.html')
 
 
-class Catalog:
-
-    list_discounts = list()
-    base_sale = PromotionsRegister.objects.values_list('general_promotions', flat=True)
-    for discount in base_sale:
-        if discount is not None and len(discount) > 4 and discount != 'Выходной':
-            list_discounts.append(discount)
-    list_discounts = list(set(list_discounts))
-
+class Search:
+    form_search = SearchForm()
+    form_filters = FiltersForm()
     data = {
-        'list_name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
-        'cities': ['Минск'],
-        'list_sizes': ['S', 'M', 'L'],
-        'sales': ['-30%', '-40%', '-60%', '-80%'],
-        'discounts': list_discounts,
+        'form_search': form_search,
+        'form_filters': form_filters,
         'list_social_discounts': ['Пенсионерам', 'Студентам', 'Детям', 'Семейные', 'На всё от 80%'],
-        'search': '',
-        'network': '',
-        'sale': 'Выберите скидку',
-        'discount': 'Выберите акцию',
-        'size': '',
-        'selected_date': '',
     }
+
+
+class Catalog:
+    form_search = SearchForm()
+    form_filters = FiltersForm()
+    data = {
+        'form_search': form_search,
+        'form_filters': form_filters,
+        'list_social_discounts': ['Пенсионерам', 'Студентам', 'Детям', 'Семейные', 'На всё от 80%'],
+    }
+    dikt_networks = {'checkbox_network_moda_max': 'Мода Макс',
+                     'checkbox_network_economy_city': 'Эконом Сити',
+                     'checkbox_network_adzenne': 'Адзенне',
+                     'checkbox_network_megahand': 'Мегахенд'}
+    dikt_sizes = {'checkbox_size_S': 'S',
+                  'checkbox_size_M': 'M',
+                  'checkbox_size_L': 'L'}
 
     def __init__(self):
         self.base_shop = Stores.objects.all()
@@ -53,64 +56,56 @@ class Catalog:
         self.discounts = PromotionsRegister.objects.all()
 
     def catalog(self, request):
+        self.data['form_filters'] = self.form_filters
         self.data['list_shop_presentation'] = self.list_shops
-        self.data['search'] = ''
-        self.data['network'] = ''
-        self.data['size'] = ''
-        self.data['selected_date'] = ''
         return render(request, 'main/catalog.html', context=self.data)
 
     def handle_search(self, request):
-        if request.GET.get('search') is not None:
-            search_str = request.GET.get('search')
-            self.data['search'] = search_str
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            search_str = request.GET['search']
             list_shop_presentation = list()
             for shop in self.list_shops:
                 name_store = shop.name_store
                 address = shop.address
                 if search_str.upper() in name_store.upper() or search_str.upper() in address.upper():
                     list_shop_presentation.append(shop)
+            self.data['form_search'] = form
             self.data['list_shop_presentation'] = list_shop_presentation
             return render(request, 'main/catalog.html', context=self.data)
 
     def handle_filtering(self, request):
         list_shops_sorted = self.list_shops
-        shops_one_city = request.GET.get('city')
-        list_store_network = request.GET.getlist('store_network')
-        list_shop_size = request.GET.getlist('shop_size')
-        sale = request.GET.get('sales')
-        discount = request.GET.get('discount')
-        date_to_search = request.GET.get('date')
+        list_networks = list()
+        list_sizes = list()
         week_day = str()
+        form = FiltersForm(request.GET)
+        if form.is_valid():
+            for key, value in request.GET.items():
+                if 'checkbox_network' in key:
+                    list_networks.append(self.dikt_networks[key])
+                if 'checkbox_size' in key:
+                    list_sizes.append(self.dikt_sizes[key])
+            if list_networks:  # если заполнен
+                list_shops_sorted = self.sort_by_shop_network(list_networks, list_shops_sorted)
+            if list_sizes:
+                list_shops_sorted = self.sort_by_shop_size(list_sizes, list_shops_sorted)
+            if request.GET['date'] is not True:
+                week_day = str(date.weekday(date.today()))
+            if request.GET['combobox_sales'] != 'Все скидки':
+                list_shops_sorted = self.processes_sale(list_shops_sorted, request.GET['combobox_sales'], week_day)
+            if request.GET['combobox_discounts'] != 'Все акции':
+                list_shops_sorted = self.processes_sale(list_shops_sorted, request.GET['combobox_discounts'], week_day)
 
-        if list_store_network:  # если заполнен
-            list_shops_sorted = self.sort_by_shop_network(list_store_network, list_shops_sorted)
-
-        if list_shop_size:
-            list_shops_sorted = self.sort_by_shop_size(list_shop_size, list_shops_sorted)
-
-        if date_to_search:
-            week_day = str(date.weekday(date.today()))
-
-        if sale != 'Выберите скидку':
-            list_shops_sorted = self.processes_sale(list_shops_sorted, sale, week_day)
-
-        if discount != 'Выберите акцию':
-            list_shops_sorted = self.processes_sale(list_shops_sorted, discount, week_day)
-
+        self.data['form_filters'] = form
         self.data['list_shop_presentation'] = list_shops_sorted
-        self.data['network'] = list_store_network
-        self.data['sale'] = sale
-        self.data['discount'] = discount
-        self.data['size'] = list_shop_size
-        self.data['selected_date'] = date_to_search
 
         return render(request, 'main/catalog.html', context=self.data)
 
-    def sort_by_shop_network(self, list_shops_network, list_shops_sorted):
+    def sort_by_shop_network(self, list_networks, list_shops_sorted):
         list_temp = list()
         for shop in list_shops_sorted:
-            if shop.name_store in list_shops_network:
+            if shop.name_store in list_networks:
                 list_temp.append(shop)
         return list_temp
 
@@ -193,11 +188,70 @@ class Catalog:
 #         store.save()
 
 def map(request):
-    form = SearchForm()
-    date = {
-        'form': form
+    form_search = SearchForm()
+    form_filters = FiltersForm()
+    data = {
+        'form_search': form_search,
+        'form_filters': form_filters,
+        'list_name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
     }
-    return render(request, 'main/map.html', context=date)
+    return render(request, 'main/map.html', context=data)
+
+
+def search(request):
+    # if request.method == 'GET':  # если запрос равен методу post
+    #     print('123')
+    #     form = SearchForm(request.GET)  # соханили значение, которое пришло в POST запросе
+    #     print(form.cleaned_data)
+    #     if form.is_valid():  # проверили пустая форма или нет
+    #         print(form.cleaned_data)  # взглянуть на форму
+    #         print('asd')
+    #         return HttpResponseRedirect('/map')
+    #     else:
+    #         return HttpResponseRedirect('/map')
+            #return render(request, 'main/map.html', context={'form': form})
+    if 'search' in request.GET:
+        form = SearchForm(request.GET)
+        if form.is_valid():
+            cd = form.cleaned_data
+            print(request.GET['search'])
+            print(cd['search'])
+    else:
+        print(request.GET)
+        form = FiltersForm(request.GET)
+        if form.is_valid():
+            list_networks = list()
+            list_sizes = list()
+            dikt_networks = {'checkbox_network_moda_max': 'Мода Макс',
+                             'checkbox_network_economy_city': 'Эконом Сити',
+                             'checkbox_network_adzenne': 'Адзенне',
+                             'checkbox_network_megahand': 'Мегахенд'}
+            dikt_sizes = {'checkbox_size_S': 'S',
+                          'checkbox_size_M': 'M',
+                          'checkbox_size_L': 'L'}
+            for key, value in request.GET.items():
+                if 'checkbox_network' in key:
+                    list_networks.append(dikt_networks[key])
+                    continue
+                if 'checkbox_size' in key:
+                    list_sizes.append(dikt_sizes[key])
+                    continue
+                if 'combobox_sales' == key:
+                    print(value)
+                if 'combobox_discounts' == key:
+                    print(value)
+            if request.GET['date']:
+                print(request.GET['date'])
+            print(list_networks)
+            print(list_sizes)
+    form_search = SearchForm()
+    form_filters = FiltersForm(request.GET)
+    data = {
+        'form_search': form_search,
+        'form_filters': form_filters
+    }
+    return render(request, 'main/map.html', context=data)
+
 
 
 # class Store(ListView):

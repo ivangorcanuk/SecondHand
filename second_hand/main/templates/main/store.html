@@ -1,9 +1,9 @@
 {% extends 'main/base.html' %}
 
-{% load static %} <!-- добавили новую функциональность, теги css -->
+{% load static %}
 
 {% block css_additional %}
-    <link rel="stylesheet" href="{% static 'main/css/store.css' %}"> <!-- rel указывает тип документа, который хотим подгрузить, "stylesheet" - css -->
+    <link rel="stylesheet" href="{% static 'css/store.css' %}">
 {% endblock %}
 
 {% block title %}
@@ -11,22 +11,38 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="=container">
     <div class="row">
         <div class="col-sm">
             <br>
-            <h1>{{ store.name_store }} {{ store.name_rating }}</h1>
+            <h1 class="hat-style">{{ store.name_store }} {{ store.name_rating }}</h1>
             <h4>{{ store.city }}, {{ store.address }}</h4>
             {% for inf in store.list_days_open_hours %}
                 <h4>{{ inf }}</h4>
                   {% endfor %}
         </div>
         <div class="col-sm">
-            <img src="{{ img.img.image.url }}" height="400" width="600">
+            <div>
+                <form action="{% url 'shop' %}" method="get">
+                    <div>
+                        <input type="submit" value="Фото" name="photo_or_map" {% if photo %} disabled {% endif %}></input>
+                        <input type="submit" value="Карта" name="photo_or_map" {% if not photo %} disabled {% endif %}></input>
+                    </div>
+                </form>
+            </div>
+            {% if photo %}
+                <div>
+                    <img src="{{ img.img.image.url }}" height="400" width="600">
+                </div>
+            {% else %}
+                <div style="position:relative;overflow:hidden;">
+                    <iframe src="https://yandex.by/map-widget/v1/?ll=27.606380%2C53.901064&mode=poi&poi%5Bpoint%5D=27.602381%2C53.901736&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D1131990351&z=16.08" width="600" height="400"  style="position:relative;"></iframe>
+                </div>
+            {% endif %}
         </div>
     </div>
-</div>
-<br>
+</div><br>
 <div class="=container">
     <div class="row">
     {% for inf in store.list_week %}

@@ -9,7 +9,7 @@ from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, Promotions
 from .shop_introduction import StoreViewItem
 from .shops_data_controller import ShopsDataController
 from django.views.generic import ListView
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 import requests
 import re
 from datetime import datetime, date, timedelta
@@ -22,16 +22,6 @@ from django.db.models import Q
 
 def index(request):
     return render(request, 'main/index.html')
-
-
-class Search:
-    form_search = SearchForm()
-    form_filters = FiltersForm()
-    data = {
-        'form_search': form_search,
-        'form_filters': form_filters,
-        'list_social_discounts': ['Пенсионерам', 'Студентам', 'Детям', 'Семейные', 'На всё от 80%'],
-    }
 
 
 class Catalog:
@@ -213,9 +203,14 @@ def search(request):
     if 'search' in request.GET:
         form = SearchForm(request.GET)
         if form.is_valid():
+            print('валидна')
             cd = form.cleaned_data
             print(request.GET['search'])
             print(cd['search'])
+        else:
+            print('не валидна')
+            return render(request, 'main/map.html', context={'form_search': form,
+                                                             'form_filters': FiltersForm()})
     else:
         print(request.GET)
         form = FiltersForm(request.GET)
@@ -266,19 +261,33 @@ def search(request):
 
 
 class Stor:
+    def __init__(self):
+        self.id_store = int()
+        self.store = None
+        self.data = dict()
+
     def stor(self, request, id_store: int):
         # a = ShopsDataController()
         # a.start()
-
+        self.id_store = id_store
         id_store = Stores.objects.get(id=id_store)
         store = StoreViewItem(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.address,
                               id_store.number_phone, id_store.number_stars, id_store.rating, id_store.size,
                               id_store.store_network, id_store.open_hours, id_store.promotion_days, id_store.img.image)
-        data = {
+        print(self.id_store)
+        self.data = {
             'store': store,
             'img': id_store,
+            'photo': True,
         }
-        return render(request, 'main/store.html', context=data)
+        return render(request, 'main/store.html', context=self.data)
+
+    def shop_map(self, request):
+        if request.GET['photo_or_map'] == 'Карта':
+            self.data['photo'] = False
+        else:
+            self.data['photo'] = True
+        return render(request, 'main/store.html', context=self.data)
 
 
 def all_shop(request):
@@ -297,7 +306,14 @@ def login(request):
 
 
 def about(request):
-    return render(request, 'main/about.html')
+    form_search = SearchForm()
+    form_filters = FiltersForm()
+    data = {
+        'form_search': form_search,
+        'form_filters': form_filters,
+        'list_name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
+    }
+    return render(request, 'main/about.html', context=data)
 
 
 def news(request):

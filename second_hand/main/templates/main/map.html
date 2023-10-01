@@ -3,37 +3,17 @@
 {% load static %} <!-- добавили новую функциональность, теги css -->
 
 {% block css_additional %}
-    <link rel="stylesheet" href="{% static 'css/map.css' %}"> <!-- rel указывает тип документа, который хотим подгрузить, "stylesheet" - css -->
 {% endblock %}
 
 {% block title %}
-Регистрация
+Карта
 {% endblock %}
 
 {% block content %}
-<form method="get" action="{% url 'sear' %}">
-   {{ form_search.search }}
-    <button type="submit" >Поиск</button><br>
-</form>
-<form method="get" action="{% url 'sear' %}">
-    <br>
-    {{ form_filters.checkbox_network_moda_max }}{{ form_filters.checkbox_network_moda_max.label }}<br>
-    {{ form_filters.checkbox_network_economy_city }}<label>{{ form_filters.checkbox_network_economy_city.label }}</label><br>
-    {{ form_filters.checkbox_network_adzenne }}<label>{{ form_filters.checkbox_network_adzenne.label }}</label><br>
-    {{ form_filters.checkbox_network_megahand }}<label>{{ form_filters.checkbox_network_megahand.label }}</label><br>
-    <br>
-    {{ form_filters.checkbox_size_S }}<label>{{ form_filters.checkbox_size_S.label }}</label><br>
-    {{ form_filters.checkbox_size_M }}<label>{{ form_filters.checkbox_size_M.label }}</label><br>
-    {{ form_filters.checkbox_size_L }}<label>{{ form_filters.checkbox_size_L.label }}</label><br>
-    <br>
-    {{ form_filters.combobox_sales }}<br>
-    <br>
-    {{ form_filters.combobox_discounts }}<br>
-    <br>
-    {{ form_filters.date }}<br><br>
-    {% for i in list_name_network %}
-        {{ form_filters.checkbox }}<label>{{ i }}</label><br>
-    {% endfor %}
-    <button type="submit" >Применить</button><br>
-</form>
+    <div style="position:relative;overflow:hidden;">
+        <a href="https://yandex.by/maps/org/ekonom_siti/1131990351/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:0px;">Эконом Сити</a>
+        <a href="https://yandex.by/maps/157/minsk/category/second_hand_shop/184107959/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:14px;">Секонд-хенд в Минске</a>
+        <a href="https://yandex.by/maps/157/minsk/category/clothing_store/184107943/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:28px;">Магазин одежды в Минске</a>
+        <iframe src="https://yandex.by/map-widget/v1/?ll=27.606380%2C53.901064&mode=poi&poi%5Bpoint%5D=27.602381%2C53.901736&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D1131990351&z=16.08" width="560" height="400" frameborder="1" allowfullscreen="true" style="position:relative;"></iframe>
+    </div>
 {% endblock %}

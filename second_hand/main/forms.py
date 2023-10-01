@@ -18,6 +18,7 @@ for discount in base_sale:
 
 class SearchForm(forms.Form):
     search = forms.CharField(max_length=100, widget=forms.TextInput(attrs={'type': "search",
+                                                                           'class': "form-control",
                                                                            'placeholder': 'Поиск...'}))
 
 
@@ -32,4 +33,5 @@ class FiltersForm(forms.Form):
     combobox_sales = forms.CharField(required=False, widget=forms.Select(choices=list_sales))
     combobox_discounts = forms.CharField(required=False, widget=forms.Select(choices=list_discounts))
     date = forms.DateField(required=False, widget=forms.DateInput(attrs={'type': "date"}))
-    checkbox = forms.BooleanField(required=False, label="S", widget=forms.CheckboxInput(attrs={'id': "siz1"}))
+    checkbox = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={'id': "siz1"}))
+

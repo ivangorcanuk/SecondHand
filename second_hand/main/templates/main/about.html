@@ -1,9 +1,32 @@
 {% extends 'main/base.html' %}
 
 {% block title %}
-Регистрация
+О нас
 {% endblock %}
 
 {% block content %}
-  <h3>Информация о сайте, возможно какие-нибудь правила сайта</h3>
+<form method="get" action="{% url 'sear' %}">
+   {{ form_search.search }}<button type="submit" >Поиск</button><br>
+</form>
+<form method="get" action="{% url 'sear' %}">
+    <br>
+    {{ form_filters.checkbox_network_moda_max }}{{ form_filters.checkbox_network_moda_max.label }}<br>
+    {{ form_filters.checkbox_network_economy_city }}<label>{{ form_filters.checkbox_network_economy_city.label }}</label><br>
+    {{ form_filters.checkbox_network_adzenne }}<label>{{ form_filters.checkbox_network_adzenne.label }}</label><br>
+    {{ form_filters.checkbox_network_megahand }}<label>{{ form_filters.checkbox_network_megahand.label }}</label><br>
+    <br>
+    {{ form_filters.checkbox_size_S }}<label>{{ form_filters.checkbox_size_S.label }}</label><br>
+    {{ form_filters.checkbox_size_M }}<label>{{ form_filters.checkbox_size_M.label }}</label><br>
+    {{ form_filters.checkbox_size_L }}<label>{{ form_filters.checkbox_size_L.label }}</label><br>
+    <br>
+    {{ form_filters.combobox_sales }}<br>
+    <br>
+    {{ form_filters.combobox_discounts }}<br>
+    <br>
+    {{ form_filters.date }}<br><br>
+    {% for i in list_name_network %}
+        {{ form_filters.checkbox }}<label id="{{ form_filters.checkbox.id_for_label }}">{{ i }}</label><br>
+    {% endfor %}
+    <button type="submit" >Применить</button><br>
+</form>
 {% endblock %}

@@ -1,9 +1,33 @@
 {% extends 'main/base.html' %}
 
+{% load static %}
+
+{% block css_additional %}
+    <link rel="stylesheet" href="{% static 'css/news.css' %}">
+{% endblock %}
+
 {% block title %}
-Регистрация
+Новости
 {% endblock %}
 
 {% block content %}
-  <h3>Новости о магазинах, например открытие нового магазина...</h3>
+<div class="str">
+    <div class="hat-style">
+        <p>1</p>
+        <p>1</p>
+        <p>1</p>
+    </div>
+    <div class="line">
+        <div class="hat-style">
+            <p>a</p>
+            <p>b</p>
+            <p>c</p>
+        </div>
+    </div>
+    <div class="hat-style">
+        <p>3</p>
+        <p>3</p>
+        <p>3</p>
+    </div>
+</div>
 {% endblock %}

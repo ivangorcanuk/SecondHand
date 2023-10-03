@@ -1,10 +1,26 @@
+.filter {
+    margin-left: 30px; /* отступ слева */
+}
 .str {
     display: flex;
 }
-.hat-style {
-    color: #f00;
-}
-.line {
+.hat-style-discounts {
+    color: #000000; /* цвет */
+    text-decoration: none; /* убрал подчеркивание */
+    font-weight: 500; /* жирный шрифт */
+    font-size: 18px; /* размер шрифта */
+    transition: color 0.3s linear; /* плавность изменения цветы при наведении маши */
+    }
+.verticalLine {
     border-left: 2px solid grey;
     height: 100%;
+}
+.one-row {
+    display: flex;
+}
+.indentation {
+    margin-right: 30px; /* отступы */
+}
+.indentationleft {
+    margin-left: 30px; /* отступ слева */
 }

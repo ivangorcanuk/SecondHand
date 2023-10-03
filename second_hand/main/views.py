@@ -28,6 +28,7 @@ class Catalog:
     form_search = SearchForm()
     form_filters = FiltersForm()
     data = {
+        'search': True,
         'form_search': form_search,
         'form_filters': form_filters,
         'list_social_discounts': ['Пенсионерам', 'Студентам', 'Детям', 'Семейные', 'На всё от 80%'],
@@ -65,6 +66,7 @@ class Catalog:
             return render(request, 'main/catalog.html', context=self.data)
 
     def handle_filtering(self, request):
+        print(request.GET)
         list_shops_sorted = self.list_shops
         list_networks = list()
         list_sizes = list()
@@ -76,14 +78,19 @@ class Catalog:
                     list_networks.append(self.dikt_networks[key])
                 if 'checkbox_size' in key:
                     list_sizes.append(self.dikt_sizes[key])
+
             if list_networks:  # если заполнен
-                list_shops_sorted = self.sort_by_shop_network(list_networks, list_shops_sorted)
+                list_shops_sorted = self.filter_by_shop_network(list_networks, list_shops_sorted)
+
             if list_sizes:
-                list_shops_sorted = self.sort_by_shop_size(list_sizes, list_shops_sorted)
-            if request.GET['date'] is not True:
+                list_shops_sorted = self.filter_by_shop_size(list_sizes, list_shops_sorted)
+
+            if request.GET['date'] != '':
                 week_day = str(date.weekday(date.today()))
+
             if request.GET['combobox_sales'] != 'Все скидки':
                 list_shops_sorted = self.processes_sale(list_shops_sorted, request.GET['combobox_sales'], week_day)
+
             if request.GET['combobox_discounts'] != 'Все акции':
                 list_shops_sorted = self.processes_sale(list_shops_sorted, request.GET['combobox_discounts'], week_day)
 
@@ -92,14 +99,14 @@ class Catalog:
 
         return render(request, 'main/catalog.html', context=self.data)
 
-    def sort_by_shop_network(self, list_networks, list_shops_sorted):
+    def filter_by_shop_network(self, list_networks, list_shops_sorted):
         list_temp = list()
         for shop in list_shops_sorted:
             if shop.name_store in list_networks:
                 list_temp.append(shop)
         return list_temp
 
-    def sort_by_shop_size(self, list_shop_size, list_shops_sorted):
+    def filter_by_shop_size(self, list_shop_size, list_shops_sorted):
         list_temp = list()
         for shop in list_shops_sorted:
             if shop.size in list_shop_size:
@@ -109,17 +116,29 @@ class Catalog:
     def processes_sale(self, list_shops_sorted, discount, week_day):
         discounts = PromotionsRegister.objects.filter(general_promotions=discount)
         list_temp = list()
-        for i in discounts:
-            for stor in list_shops_sorted:
-                if week_day == '':
-                    for j in range(datetime.weekday(date.today()), len(stor.list_promotion)):
-                        list_id = stor.list_promotion[j].split('*')
-                        if str(i.id) in list_id:
-                            list_temp.append(stor)
-                else:
-                    list_id = stor.list_promotion[int(week_day)].split('*')
-                    if str(i.id) in list_id:
+        list_days = [i for i in range(datetime.weekday(date.today()), 7)]
+
+        if week_day != '':
+            list_days = [int(week_day) - 1]
+        print(list_days)
+        for stor in list_shops_sorted:
+            for j in list_days:
+                list_id = stor.list_promotion[j].split('*')
+                for disc in discounts:
+                    if str(disc.id) in list_id:
                         list_temp.append(stor)
+                        break
+        # for i in discounts:
+        #     for stor in list_shops_sorted:
+        #         if week_day == '':
+        #             for j in range(datetime.weekday(date.today()), len(stor.list_promotion)):
+        #                 list_id = stor.list_promotion[j].split('*')
+        #                 if str(i.id) in list_id:
+        #                     list_temp.append(stor)
+        #         else:
+        #             list_id = stor.list_promotion[int(week_day)].split('*')
+        #             if str(i.id) in list_id:
+        #                 list_temp.append(stor)
         return list_temp
 
     def convert_to_view_item(self, base_shop):
@@ -138,7 +157,7 @@ class Catalog:
             'Детям': ['Детский день'],
             'Семейные': ['3я вещь в подарок', '4я вещь в подарок'],
             'На всё от 80%': ['-80%', '-85%', '-90%', '-95%', 'Всё по 1 рублю',
-                              'Всё по 2 рубля', 'Всё по 4 рубля', 'Всё по 4 рубля']
+                              'Всё по 2 рубля', 'Всё по 4 рубля']
         }
         list_temp = list()
         for promotion in self.discounts:
@@ -178,74 +197,11 @@ class Catalog:
 #         store.save()
 
 def map(request):
-    form_search = SearchForm()
-    form_filters = FiltersForm()
-    data = {
-        'form_search': form_search,
-        'form_filters': form_filters,
-        'list_name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
-    }
-    return render(request, 'main/map.html', context=data)
+    return render(request, 'main/map.html')
 
 
 def search(request):
-    # if request.method == 'GET':  # если запрос равен методу post
-    #     print('123')
-    #     form = SearchForm(request.GET)  # соханили значение, которое пришло в POST запросе
-    #     print(form.cleaned_data)
-    #     if form.is_valid():  # проверили пустая форма или нет
-    #         print(form.cleaned_data)  # взглянуть на форму
-    #         print('asd')
-    #         return HttpResponseRedirect('/map')
-    #     else:
-    #         return HttpResponseRedirect('/map')
-            #return render(request, 'main/map.html', context={'form': form})
-    if 'search' in request.GET:
-        form = SearchForm(request.GET)
-        if form.is_valid():
-            print('валидна')
-            cd = form.cleaned_data
-            print(request.GET['search'])
-            print(cd['search'])
-        else:
-            print('не валидна')
-            return render(request, 'main/map.html', context={'form_search': form,
-                                                             'form_filters': FiltersForm()})
-    else:
-        print(request.GET)
-        form = FiltersForm(request.GET)
-        if form.is_valid():
-            list_networks = list()
-            list_sizes = list()
-            dikt_networks = {'checkbox_network_moda_max': 'Мода Макс',
-                             'checkbox_network_economy_city': 'Эконом Сити',
-                             'checkbox_network_adzenne': 'Адзенне',
-                             'checkbox_network_megahand': 'Мегахенд'}
-            dikt_sizes = {'checkbox_size_S': 'S',
-                          'checkbox_size_M': 'M',
-                          'checkbox_size_L': 'L'}
-            for key, value in request.GET.items():
-                if 'checkbox_network' in key:
-                    list_networks.append(dikt_networks[key])
-                    continue
-                if 'checkbox_size' in key:
-                    list_sizes.append(dikt_sizes[key])
-                    continue
-                if 'combobox_sales' == key:
-                    print(value)
-                if 'combobox_discounts' == key:
-                    print(value)
-            if request.GET['date']:
-                print(request.GET['date'])
-            print(list_networks)
-            print(list_sizes)
-    form_search = SearchForm()
-    form_filters = FiltersForm(request.GET)
-    data = {
-        'form_search': form_search,
-        'form_filters': form_filters
-    }
-    return render(request, 'main/map.html', context=data)
+    return render(request, 'main/map.html')
 
 
 

@@ -45,7 +45,8 @@ class StoreViewItem:
         self.opening_hours_today_text = self.get_todays_open_hours()  # готовая строка для отображения рабочего времени
         self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
         self.list_promotion_days = self.get_promotion_list_by_id()
-        self.list_catalog_prom_days = self.list_promotion_days[datetime.weekday(date.today()):len(self.list_promotion_days)]
+        #self.list_catalog_prom_days = self.list_promotion_days[datetime.weekday(date.today()):len(self.list_promotion_days)]
+        self.dict_catalog_prom_days = self.converted_to_dict(self.list_promotion_days)
 
     def get_todays_open_hours(self):
         for day in self.list_open_hours:
@@ -101,12 +102,12 @@ class StoreViewItem:
 
     def get_promotion_list_by_id(self):
         list_temp = list()
-        for element in self.list_promotion:  # проходим по списку с id скидок
+        for i in range(len(self.list_promotion)):  # проходим по списку с id скидок
             list_promotion = list()
-            if element == '':
+            if self.list_promotion[i] == '':
                 list_promotion.append('Нет скидки')
             else:
-                list_id_promotion = element.split('*')  # разбили склеиный элемент и поместили в отдельный список
+                list_id_promotion = self.list_promotion[i].split('*')  # разбили склеиный элемент и поместили в отдельный список
                 for j in list_id_promotion:
                     promotion = PromotionsRegister.objects.get(id=int(j))
                     list_promotion.append(promotion.promotion_name)
@@ -114,3 +115,9 @@ class StoreViewItem:
         # for i in list_temp:
         #     print(i)
         return list_temp
+
+    def converted_to_dict(self, list_promotion_days):
+        dict_catalog_prom_days = dict()
+        for i in range(len(list_promotion_days)):
+            dict_catalog_prom_days[self.list_week[i]] = list_promotion_days[i]
+        return dict_catalog_prom_days

@@ -4,6 +4,10 @@
 
 {% block css_additional %}
     <link rel="stylesheet" href="{% static 'css/news.css' %}">
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=17f348d1-c049-43ed-bf02-73116330dd7b&lang=ru_RU" type="text/javascript">
+    </script>
+    <script type="text/javascript" src="{% static 'js/script.js' %}">
+    </script>
 {% endblock %}
 
 {% block title %}
@@ -11,23 +15,5 @@
 {% endblock %}
 
 {% block content %}
-<div class="str">
-    <div class="hat-style">
-        <p>1</p>
-        <p>1</p>
-        <p>1</p>
-    </div>
-    <div class="line">
-        <div class="hat-style">
-            <p>a</p>
-            <p>b</p>
-            <p>c</p>
-        </div>
-    </div>
-    <div class="hat-style">
-        <p>3</p>
-        <p>3</p>
-        <p>3</p>
-    </div>
-</div>
+<div class="map" id="map"></div>
 {% endblock %}

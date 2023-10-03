@@ -1,0 +1,20 @@
+.cap {
+    display: flex; /* размемтил элементы шапки в ряд */
+    padding-top: 10px; /* отступил от верха */
+    align-items: center; /* выравнял элементы по центру картинки */
+}
+.logo {
+    width: 5%;
+    margin-right: 30px;
+}
+.hat-style-elements:hover {
+    color: #177245 /* меняет цвет при наведении мыши */
+}
+.hat-style-elements {
+    color: #000000; /* цвет */
+    text-decoration: none; /* выравнял элементы по центру картинки */
+    font-weight: 700; /* жирный шрифт */
+    font-size: 20px; /* размер шрифта */
+    margin-right: 30px; /* отступы */
+    transition: color 0.3s linear; /* плавность изменения цветы при наведении маши */
+}

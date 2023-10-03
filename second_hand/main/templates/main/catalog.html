@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block css_additional %}
-    <link rel="stylesheet" href="{% static 'css/news.css' %}">
+    <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
 {% endblock %}
 
 {% block title %}
@@ -58,8 +58,8 @@
             </div>
         </form>
     </div>
-    <div class="line">
-        <div class="">
+    <div class="verticalLine">
+        <div class="indentationleft">
             {% for inf in list_shop_presentation %}
             <div class="one-row">
                 <div class="indentation">
@@ -77,8 +77,11 @@
                         <p>{{ inf.opening_hours_today_text }}</p>
                     </div>
                 </div>
-                <div>
-                    <p>{{ inf.list_catalog_prom_days }}</p>
+                <div class="one-row">
+                    {% for i, j in inf.dict_catalog_prom_days.items %}
+                        <p>{{ i }}</p><br><br>
+                        <p>{{ j }}</p>
+                    {% endfor %}
                 </div>
             </div>
                 <hr>

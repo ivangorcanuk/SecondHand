@@ -82,14 +82,14 @@ class ModaMaxParserDataProcessor(DataProcessorBase):
 
 class EconomCityParserDataProcessor(DataProcessorBase):
     list_discount = ['20%', '30%', '40%', '50%', '60%', '70%', '80%', 'День сеньора', '3я вещь в подарок',
-                     'Большое пополнение', 'Всё по 4 рубля', 'Полная смена товара', 'Детский день',
+                     'Большое пополнение', 'Всё по 4 руб', 'Полная смена товара', 'Детский день',
                      'Текстиль', 'Товар премиум', 'x2 скидка по дисконту', '4я вещь в подарок', 'Пополнение товара',
                      'Большое поступление', 'Винтаж', 'Обувь']
 
     def __init__(self):
         DataProcessorBase.__init__(self)
         self.__exception_full_change = str()  # исключение работы магазина в день полной смены товара
-        self.__exception_all_by_3 = str()  # исключение работы магазина в день акции все по 3 рубля
+        self.__exception_all_by_3 = str()  # исключение работы магазина в день акции все по 4 рубля
 
     def get_network_name(self):
         return 'Эконом Сити'
@@ -109,6 +109,8 @@ class EconomCityParserDataProcessor(DataProcessorBase):
                 print(key, value)
             for key, value in dict_discounts.items():
                 print(key, value)
+            self.__exception_full_change = str()
+            self.__exception_all_by_3 = str()
         return self._list_shops
 
     def get_discount(self, list_discounts):
@@ -127,6 +129,7 @@ class EconomCityParserDataProcessor(DataProcessorBase):
         for key, value in dict_discounts.items():
             list_temp = []
             for discount in value:
+                discount = discount.strip()
                 for i in self.list_discount:
                     if i in discount or i in discount.title():
                         list_temp.append(i)
@@ -153,7 +156,6 @@ class EconomCityParserDataProcessor(DataProcessorBase):
         if 'В день акции' in schedule_raw:
             temp_time_all_by_3 = re.search(r'В день акции.*(\d\d.\d\d\s*.\s*\d\d.\d\d)', schedule_raw)
             self.__exception_all_by_3 = temp_time_all_by_3.group(1)
-        print([converted_timetable])
 
         return DataProcessorBase.get_schedule(self, converted_timetable)
 
@@ -164,7 +166,7 @@ class EconomCityParserDataProcessor(DataProcessorBase):
             for j in value:
                 if 'Полная смена товара' in j:
                     dict_schedule[key] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
-                if 'Всё по 3 рубля' in j:
+                if 'Всё по 4' in j:
                     dict_schedule[key] = self.convert_to_datetime(start_finish.group(1), start_finish.group(2), i)
             i += 1
 

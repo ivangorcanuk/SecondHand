@@ -1,3 +1,13 @@
-.list {
-    display: flex;
+.map-container {
+    width: 600px;
+    height: 400px;
+    background-color: #333;
+}
+[class*="copyrights-pane"] {
+    display: none !important;
+}
+.category-button {
+    padding: 10px;
+    margin-right: 10px;
+    cursor: pointer;
 }

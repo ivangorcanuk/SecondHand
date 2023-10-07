@@ -78,10 +78,15 @@
                     </div>
                 </div>
                 <div class="one-row">
-                    {% for i, j in inf.dict_catalog_prom_days.items %}
-                        <p>{{ i }}</p><br><br>
-                        <p>{{ j }}</p>
-                    {% endfor %}
+                    <div class="cont-day">
+                        {% for kit in inf.list_promotion_days %}
+                            <div>
+                                {% for i in kit %}
+                                    <p>{{ i }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
                 <hr>

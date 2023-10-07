@@ -1,5 +1,5 @@
 from django import forms
-from .models import PromotionsRegister
+#from .models import PromotionsRegister
 
 list_sales = [
     ('Все скидки', 'Все скидки'),
@@ -10,10 +10,10 @@ list_sales = [
              ]
 
 list_discounts = [('Все акции', 'Все акции')]
-base_sale = PromotionsRegister.objects.values_list('general_promotions', flat=True).distinct()
-for discount in base_sale:
-    if discount is not None and len(discount) > 4 and discount != 'Выходной':
-        list_discounts.append((discount, discount))
+# base_sale = PromotionsRegister.objects.values_list('general_promotions', flat=True).distinct()
+# for discount in base_sale:
+#     if discount is not None and len(discount) > 4 and discount != 'Выходной':
+#         list_discounts.append((discount, discount))
 
 
 class SearchForm(forms.Form):

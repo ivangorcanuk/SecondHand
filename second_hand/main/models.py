@@ -85,6 +85,8 @@ class Stores(models.Model):  # магазины
     open_hours = models.ForeignKey(OpenHours, on_delete=models.CASCADE, null=True, blank=True)  # id времени работы
     promotion_days = models.ForeignKey(PromotionDays, on_delete=models.CASCADE, null=True, blank=True)  # id скидок
     img = models.ForeignKey(Gallery, on_delete=models.PROTECT, null=True, blank=True)  # id скидок
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
     #slug = models.SlugField(default='', null=False)
 
     def __str__(self):

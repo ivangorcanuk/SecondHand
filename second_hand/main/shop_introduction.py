@@ -46,7 +46,8 @@ class StoreViewItem:
         self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
         self.list_promotion_days = self.get_promotion_list_by_id()
         #self.list_catalog_prom_days = self.list_promotion_days[datetime.weekday(date.today()):len(self.list_promotion_days)]
-        self.dict_catalog_prom_days = self.converted_to_dict(self.list_promotion_days)
+        #self.dict_catalog_prom_days = self.converted_to_dict(self.list_promotion_days)
+        self.list_catalog_prom_days = self.converted_to_dict(self.list_promotion_days)
 
     def get_todays_open_hours(self):
         for day in self.list_open_hours:
@@ -104,16 +105,16 @@ class StoreViewItem:
         list_temp = list()
         for i in range(len(self.list_promotion)):  # проходим по списку с id скидок
             list_promotion = list()
+            list_promotion.append(self.list_week[i])
             if self.list_promotion[i] == '':
                 list_promotion.append('Нет скидки')
             else:
                 list_id_promotion = self.list_promotion[i].split('*')  # разбили склеиный элемент и поместили в отдельный список
                 for j in list_id_promotion:
-                    promotion = PromotionsRegister.objects.get(id=int(j))
-                    list_promotion.append(promotion.promotion_name)
+                    pass
+                    # promotion = PromotionsRegister.objects.get(id=int(j))
+                    # list_promotion.append(promotion.promotion_name)
             list_temp.append(tuple(list_promotion))
-        # for i in list_temp:
-        #     print(i)
         return list_temp
 
     def converted_to_dict(self, list_promotion_days):

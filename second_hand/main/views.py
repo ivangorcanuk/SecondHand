@@ -4,8 +4,10 @@
 # CreatelView создать запись
 # UpdateView изменить запись
 # DeleteView удалить запись
+import json
+
 from django.shortcuts import render
-from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, PromotionsRegister, PromotionDays, Gallery
+#from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, PromotionsRegister, PromotionDays, Gallery
 from .shop_introduction import StoreViewItem
 from .shops_data_controller import ShopsDataController
 from django.views.generic import ListView
@@ -42,9 +44,12 @@ class Catalog:
                   'checkbox_size_L': 'L'}
 
     def __init__(self):
-        self.base_shop = Stores.objects.all()
-        self.list_shops = self.convert_to_view_item(self.base_shop)
-        self.discounts = PromotionsRegister.objects.all()
+        #self.base_shop = Stores.objects.all()
+        # self.list_shops = self.convert_to_view_item(self.base_shop)
+        # self.discounts = PromotionsRegister.objects.all()
+        self.base_shop = None
+        self.list_shops = None
+        self.discounts = None
 
     def catalog(self, request):
         self.data['form_filters'] = self.form_filters
@@ -85,14 +90,11 @@ class Catalog:
             if list_sizes:
                 list_shops_sorted = self.filter_by_shop_size(list_sizes, list_shops_sorted)
 
-            if request.GET['date'] != '':
-                week_day = str(date.weekday(date.today()))
-
             if request.GET['combobox_sales'] != 'Все скидки':
-                list_shops_sorted = self.processes_sale(list_shops_sorted, request.GET['combobox_sales'], week_day)
+                list_shops_sorted = self.processes_sale(list_shops_sorted, request.GET['combobox_sales'], request.GET['date'])
 
             if request.GET['combobox_discounts'] != 'Все акции':
-                list_shops_sorted = self.processes_sale(list_shops_sorted, request.GET['combobox_discounts'], week_day)
+                list_shops_sorted = self.processes_sale(list_shops_sorted, request.GET['combobox_discounts'], request.GET['date'])
 
         self.data['form_filters'] = form
         self.data['list_shop_presentation'] = list_shops_sorted
@@ -114,13 +116,15 @@ class Catalog:
         return list_temp
 
     def processes_sale(self, list_shops_sorted, discount, week_day):
-        discounts = PromotionsRegister.objects.filter(general_promotions=discount)
+        #discounts = PromotionsRegister.objects.filter(general_promotions=discount)
+        discounts = []
         list_temp = list()
         list_days = [i for i in range(datetime.weekday(date.today()), 7)]
 
         if week_day != '':
-            list_days = [int(week_day) - 1]
-        print(list_days)
+            week_day = datetime.strptime(week_day, '%Y-%m-%d')
+            list_days = [date.weekday(week_day)]
+
         for stor in list_shops_sorted:
             for j in list_days:
                 list_id = stor.list_promotion[j].split('*')
@@ -128,17 +132,6 @@ class Catalog:
                     if str(disc.id) in list_id:
                         list_temp.append(stor)
                         break
-        # for i in discounts:
-        #     for stor in list_shops_sorted:
-        #         if week_day == '':
-        #             for j in range(datetime.weekday(date.today()), len(stor.list_promotion)):
-        #                 list_id = stor.list_promotion[j].split('*')
-        #                 if str(i.id) in list_id:
-        #                     list_temp.append(stor)
-        #         else:
-        #             list_id = stor.list_promotion[int(week_day)].split('*')
-        #             if str(i.id) in list_id:
-        #                 list_temp.append(stor)
         return list_temp
 
     def convert_to_view_item(self, base_shop):
@@ -167,6 +160,8 @@ class Catalog:
                         list_id = shop.list_promotion[j].split('*')
                         if str(promotion.id) in list_id:
                             list_temp.append(shop)
+        self.data['form_search'] = self.form_search
+        self.data['form_filters'] = self.form_filters
         self.data['list_shop_presentation'] = list_temp
         return render(request, 'main/catalog.html', context=self.data)
 
@@ -226,11 +221,12 @@ class Stor:
         # a = ShopsDataController()
         # a.start()
         self.id_store = id_store
-        id_store = Stores.objects.get(id=id_store)
-        store = StoreViewItem(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.address,
-                              id_store.number_phone, id_store.number_stars, id_store.rating, id_store.size,
-                              id_store.store_network, id_store.open_hours, id_store.promotion_days, id_store.img.image)
-        print(self.id_store)
+        store = None
+        # id_store = Stores.objects.get(id=id_store)
+        # store = StoreViewItem(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.address,
+        #                       id_store.number_phone, id_store.number_stars, id_store.rating, id_store.size,
+        #                       id_store.store_network, id_store.open_hours, id_store.promotion_days, id_store.img.image)
+        # print(self.id_store)
         self.data = {
             'store': store,
             'img': id_store,
@@ -243,6 +239,14 @@ class Stor:
             self.data['photo'] = False
         else:
             self.data['photo'] = True
+        self.data['data'] = json.dumps(
+            [
+                {
+                    'lat': 53.91221519598809,
+                    'lon': 27.599024188416895,
+                }
+            ]
+        )
         return render(request, 'main/store.html', context=self.data)
 
 

@@ -17,10 +17,16 @@
 }
 .one-row {
     display: flex;
+    margin-right: 50px;
 }
 .indentation {
     margin-right: 30px; /* отступы */
 }
 .indentationleft {
     margin-left: 30px; /* отступ слева */
+}
+.cont-day {
+    width: 100px;
+    height: 120px;
+    background-color: #333;
 }

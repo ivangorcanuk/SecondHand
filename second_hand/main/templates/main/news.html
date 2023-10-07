@@ -4,10 +4,6 @@
 
 {% block css_additional %}
     <link rel="stylesheet" href="{% static 'css/news.css' %}">
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=17f348d1-c049-43ed-bf02-73116330dd7b&lang=ru_RU" type="text/javascript">
-    </script>
-    <script type="text/javascript" src="{% static 'js/script.js' %}">
-    </script>
 {% endblock %}
 
 {% block title %}
@@ -15,5 +11,5 @@
 {% endblock %}
 
 {% block content %}
-<div class="map" id="map"></div>
+<h3>Новости</h3>
 {% endblock %}

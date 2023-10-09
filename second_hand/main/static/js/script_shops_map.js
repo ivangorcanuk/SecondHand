@@ -1,52 +1,13 @@
+function loadJson(selector) {
+    return JSON.parse(document.querySelector(selector).getAttribute('data-json'));
+}
+
 const categoriesData = {
-    category1: [{
-            lat: 53.9202155706571,
-            lon: 27.57452449999998,
-            name: 'Мода Макс'
-        },
-        {
-            lat: 53.924654070639384,
-            lon: 27.591547499999912,
-            name: 'Мода Макс'
-        },
-        {
-            lat: 53.92518907064077,
-            lon: 27.607186999999957,
-            name: 'Мода Макс'
-        }
-    ],
-    category2: [{
-            lat: 53.90329157067195,
-            lon: 27.546281499999957,
-            name: 'Эконом Сити'
-        },
-        {
-            lat: 53.90167357066778,
-            lon: 27.602380999999962,
-            name: 'Эконом Сити'
-        },
-        {
-            lat: 53.91784557065102,
-            lon: 27.58914899999998,
-            name: 'Эконом Сити'
-        }
-    ],
-    category3: [{
-            lat: 53.88545307065526,
-            lon: 27.503835999999996,
-            name: 'Адзенне'
-        },
-        {
-            lat: 53.91822207062285,
-            lon: 27.45385349999998,
-            name: 'Адзенне'
-        },
-        {
-            lat: 53.939317070618756,
-            lon: 27.59462850000001,
-            name: 'Адзенне'
-        }
-    ],
+    category1: loadJson('#jsonData')[0],
+    category2: loadJson('#jsonData')[1],
+    category3: loadJson('#jsonData')[2],
+    category4: loadJson('#jsonData')[3],
+    category5: loadJson('#jsonData')[4],
 }
 
 const init = () => {
@@ -62,8 +23,14 @@ const init = () => {
 
         categoriesData[category].forEach((item) => { // проходим циклом по славарю с координатами
             const placemark = new ymaps.Placemark([item.lat, item.lon], {
-                hintContent: item.name,
-                balloonContent: item.name,
+                balloonContentHeader: item.name,
+                balloonContentBody: item.address,
+                balloonContentFooter: item.number_phone,
+            },{
+                iconLayout: 'default#image', // указали, что будем использовать свой стиль для метки
+                iconImageHref: 'static/img/map-point.png', // используем выбранный нами стиль метки
+                iconImageSize: [30, 30], // установили размер метки
+                iconImageOffset: [-15, 30], // отступ от центра
             });
 
             map.geoObjects.add(placemark); // удаляем все маркеры с карты

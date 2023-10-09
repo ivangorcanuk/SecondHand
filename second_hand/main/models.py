@@ -77,7 +77,7 @@ class Stores(models.Model):  # магазины
     country = models.CharField(max_length=50, blank=True)  # страна
     city = models.CharField(max_length=50)  # город
     address = models.CharField(max_length=50)  # адрес
-    number_phone = models.IntegerField()  # номер телефона магазина
+    number_phone = models.CharField(max_length=17)  # номер телефона магазина
     number_stars = models.IntegerField(null=True, blank=True)  # количество звезд оставленных подьзователями
     rating = models.FloatField(null=True, blank=True)
     size = models.CharField(max_length=1, null=True, blank=True)

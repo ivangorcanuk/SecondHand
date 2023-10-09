@@ -47,13 +47,13 @@ class ShopsDataDBSaver:
     def get_id_discounts(self, network_name, dict_discounts):
         dict_id_discounts = dict()
         for key, value in dict_discounts.items():
-            a = str()
+            str_id = str()
             for discount in self.__list_discounts:
                 for disc in value:
                     if discount.promotion_name == disc:
                         if discount.store_network == network_name or discount.store_network is None:
-                            if a != '':
-                                a += '*'
-                            a += str(discount.id)
-            dict_id_discounts[key] = a
+                            if str_id != '':
+                                str_id += '*'
+                            str_id += str(discount.id)
+            dict_id_discounts[key] = str_id
         return dict_id_discounts

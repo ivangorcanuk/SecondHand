@@ -15,9 +15,19 @@ function init() {
     });
 
     let placemark = new ymaps.Placemark([lat, lon], {
-        balloonContentHeader: 'Эконом Сити',
-        balloonContentBody: 'ул. Долгобродская, 3',
-        balloonContentFooter: '+375(29)803-21-68',
+//        balloonContentHeader: 'Эконом Сити',
+//        balloonContentBody: 'ул. Долгобродская, 3',
+//        balloonContentFooter: '+375(29)803-21-68',
+        balloonContent: `
+
+        <div class="balloon">
+            <div class="balloon__address">Магаз</div>
+            <div class="balloon__contains">
+                <a href="">ссылка</a>
+            </div>
+        </div>
+
+        `
         },{
         iconLayout: 'default#image', // указали, что будем использовать свой стиль для метки
         iconImageHref: 'static/img/map-point.png', // используем выбранный нами стиль метки

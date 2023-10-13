@@ -79,7 +79,12 @@
 
                             <div class="cont-day">
                                 <h6>{{ key }}</h6>
+
+                                {% if value.0.0 %}
                                 <p>{{ value.0.0.general_promotions }}</p>
+                                {% else %}
+                                <p>' '</p>
+                                {% endif %}
 
                                 {% if value.1 %}
                                     {% for prom in value.1 %}

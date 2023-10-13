@@ -207,6 +207,7 @@ class Map:
 
     def __init__(self):
         self.all_shop = self.db.base_shop
+        self.list_shops = self.convert_to_view_item(self.all_shop)
 
     def map(self, request):
         data = dict()
@@ -229,23 +230,29 @@ class Map:
         else:
             condition = 'Все'
 
-        for shop in self.all_shop:
+        for shop in self.list_shops:
             dict_temp = dict()
+            dict_temp['lat'] = shop.latitude
+            dict_temp['lon'] = shop.longitude
+            dict_temp['name'] = shop.name_store
+            dict_temp['address'] = shop.address
+            dict_temp['phone'] = shop.number_phone
+            dict_temp['link'] = shop.link
+            dict_temp['time_work'] = shop.opening_hours_today_text
             if condition == shop.name_store:
-                dict_temp['lat'] = shop.latitude
-                dict_temp['lon'] = shop.longitude
-                dict_temp['name'] = shop.name_store
-                dict_temp['address'] = shop.address
-                dict_temp['number_phone'] = shop.number_phone
                 list_temp.append(dict_temp)
             elif condition == 'Все':
-                dict_temp['lat'] = shop.latitude
-                dict_temp['lon'] = shop.longitude
-                dict_temp['name'] = shop.name_store
-                dict_temp['address'] = shop.address
-                dict_temp['number_phone'] = shop.number_phone
                 list_temp.append(dict_temp)
         return list_temp
+
+    def convert_to_view_item(self, base_shop):
+        list_shop_presentation = list()
+        for shop in base_shop:  # прошлись по таблице с магазинами и отправили данные в класс представления
+            st = StoreViewItem(shop.id, shop.name_store, shop.country, shop.city, shop.address, shop.number_phone,
+                               shop.number_stars, shop.rating, shop.size, shop.store_network, shop.open_hours,
+                               shop.promotion_days, shop.img, shop.latitude, shop.longitude, shop.link_shop)
+            list_shop_presentation.append(st)
+        return list_shop_presentation
 
 
 def about(request):

@@ -15,15 +15,14 @@ function init() {
     });
 
     let placemark = new ymaps.Placemark([lat, lon], {
-        hintContent: 'Эконом Сити',
         balloonContentHeader: 'Эконом Сити',
         balloonContentBody: 'ул. Долгобродская, 3',
         balloonContentFooter: '+375(29)803-21-68',
         },{
         iconLayout: 'default#image', // указали, что будем использовать свой стиль для метки
-        iconImageHref: 'https://cdn-icons-png.flaticon.com/128/5817/5817230.png', // используем выбранный нами стиль метки
+        iconImageHref: 'static/img/map-point.png', // используем выбранный нами стиль метки
         iconImageSize: [30, 30], // используем выбранный нами стиль метки
-        iconImageOffset: [-10, -10], // отступ от центра
+        iconImageOffset: [-14, -25], // отступ от центра
         });
 
     map.controls.remove('geolocationControl');  // удаляем геолокацию

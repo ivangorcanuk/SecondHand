@@ -1,5 +1,5 @@
 from django import forms
-#from .models import PromotionsRegister
+from .db_interaction_handler import DBInteractionHandler
 
 list_sales = [
     ('Все скидки', 'Все скидки'),
@@ -10,10 +10,11 @@ list_sales = [
              ]
 
 list_discounts = [('Все акции', 'Все акции')]
-# base_sale = PromotionsRegister.objects.values_list('general_promotions', flat=True).distinct()
-# for discount in base_sale:
-#     if discount is not None and len(discount) > 4 and discount != 'Выходной':
-#         list_discounts.append((discount, discount))
+db = DBInteractionHandler()
+base_sale = db.base_non_repeat_sale
+for discount in base_sale:
+    if discount is not None:
+        list_discounts.append((discount, discount))
 
 
 class SearchForm(forms.Form):

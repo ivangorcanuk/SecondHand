@@ -56,4 +56,5 @@ class ShopsDataDBSaver:
                                 str_id += '*'
                             str_id += str(discount.id)
             dict_id_discounts[key] = str_id
+            print(dict_id_discounts[key])
         return dict_id_discounts

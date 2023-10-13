@@ -1,13 +1,13 @@
 {% extends 'main/base.html' %}
 
-{% load static %}
-
-{% block css_additional %}
-    <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
-{% endblock %}
-
 {% block title %}
 Каталог
+{% endblock %}
+
+{% load static %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -60,36 +60,37 @@
     </div>
     <div class="verticalLine">
         <div class="indentationleft">
-            {% for inf in list_shop_presentation %}
-            <div class="one-row">
-                <div class="indentation">
-                    <img src="{{ inf.img.image.url }}" height="100" width="120">
-                </div>
-                <div class="indentation">
-                    <h5><a href="{% url 'store' inf.id %}">{{ inf.name_store }} {{ inf.name_rating }}</a></h5>
-                    <div class="">
-                        <p>{{ inf.city }}, {{ inf.address }}</p>
-                    </div>
-                    <div class="size">
-                        <p>Размер магазина: {{ inf.size }}</p>
-                    </div>
+            {% for shop in list_shops_presentation %}
+
+                <div class="cont-shop">
                     <div>
-                        <p>{{ inf.opening_hours_today_text }}</p>
+                        <img src="{{ shop.img.image.url }}" height="100" width="120">
                     </div>
-                </div>
-                <div class="one-row">
-                    <div class="cont-day">
-                        {% for kit in inf.list_promotion_days %}
-                            <div>
-                                {% for i in kit %}
-                                    <p>{{ i }}</p>
-                                {% endfor %}
+
+                    <div class="cont-inf-shop">
+                        <h5><a href="{% url 'store' shop.id %}">{{ shop.name_store }} {{ shop.name_rating }}</a></h5>
+                        <p>{{ shop.city }},<br> {{ shop.address }}</p>
+                        <p>Размер магазина: {{ shop.size }}</p>
+                        <p>{{ shop.opening_hours_today_text }}</p>
+                    </div>
+
+                    <div class="one-row">
+                        {% for key, value in shop.dict_catalog_prom_days.items %}
+
+                            <div class="cont-day">
+                                <h6>{{ key }}</h6>
+                                <p>{{ value.0.0.general_promotions }}</p>
+
+                                {% if value.1 %}
+                                    {% for prom in value.1 %}
+                                        <img src="{{ prom.image }}" width="30" height="30">
+                                    {% endfor %}
+                                {% endif %}
                             </div>
+
                         {% endfor %}
                     </div>
                 </div>
-            </div>
-                <hr>
             {% endfor %}
         </div>
     </div>

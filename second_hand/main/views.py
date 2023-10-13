@@ -5,9 +5,8 @@
 # UpdateView изменить запись
 # DeleteView удалить запись
 import json
-
 from django.shortcuts import render
-#from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, PromotionsRegister, PromotionDays, Gallery
+from .db_interaction_handler import DBInteractionHandler
 from .shop_introduction import StoreViewItem
 from .shops_data_controller import ShopsDataController
 from django.views.generic import ListView
@@ -18,8 +17,7 @@ from datetime import datetime, date, timedelta
 from .forms import SearchForm, FiltersForm, list_sales, list_discounts
 from django.db.models import Q
 
-# придумать хитрый механизм для отображения рабочего времени по дням недели!
-# добавить уникальность open_hours
+# создать переменную объекта класса Базы данных и польлозоваться ею во всех классах или в каждом классе создавать свою переменную
 
 
 def index(request):
@@ -27,6 +25,7 @@ def index(request):
 
 
 class Catalog:
+    db = DBInteractionHandler()
     form_search = SearchForm()
     form_filters = FiltersForm()
     data = {
@@ -44,20 +43,18 @@ class Catalog:
                   'checkbox_size_L': 'L'}
 
     def __init__(self):
-        #self.base_shop = Stores.objects.all()
-        # self.list_shops = self.convert_to_view_item(self.base_shop)
-        # self.discounts = PromotionsRegister.objects.all()
-        self.base_shop = None
-        self.list_shops = None
-        self.discounts = None
+        self.base_shop = self.db.base_shop
+        self.list_shops = self.convert_to_view_item(self.base_shop)
+        self.discounts = self.db.base_sale
 
     def catalog(self, request):
         self.data['form_filters'] = self.form_filters
-        self.data['list_shop_presentation'] = self.list_shops
+        self.data['list_shops_presentation'] = self.list_shops
         return render(request, 'main/catalog.html', context=self.data)
 
     def handle_search(self, request):
         form = SearchForm(request.GET)
+        print(request.GET['search'])
         if form.is_valid():
             search_str = request.GET['search']
             list_shop_presentation = list()
@@ -67,7 +64,7 @@ class Catalog:
                 if search_str.upper() in name_store.upper() or search_str.upper() in address.upper():
                     list_shop_presentation.append(shop)
             self.data['form_search'] = form
-            self.data['list_shop_presentation'] = list_shop_presentation
+            self.data['list_shops_presentation'] = list_shop_presentation
             return render(request, 'main/catalog.html', context=self.data)
 
     def handle_filtering(self, request):
@@ -97,7 +94,7 @@ class Catalog:
                 list_shops_sorted = self.processes_sale(list_shops_sorted, request.GET['combobox_discounts'], request.GET['date'])
 
         self.data['form_filters'] = form
-        self.data['list_shop_presentation'] = list_shops_sorted
+        self.data['list_shops_presentation'] = list_shops_sorted
 
         return render(request, 'main/catalog.html', context=self.data)
 
@@ -116,8 +113,7 @@ class Catalog:
         return list_temp
 
     def processes_sale(self, list_shops_sorted, discount, week_day):
-        #discounts = PromotionsRegister.objects.filter(general_promotions=discount)
-        discounts = []
+        discounts = self.db.get_sale_similar(discount)
         list_temp = list()
         list_days = [i for i in range(datetime.weekday(date.today()), 7)]
 
@@ -136,10 +132,10 @@ class Catalog:
 
     def convert_to_view_item(self, base_shop):
         list_shop_presentation = list()
-        for store in base_shop:  # прошлись по таблице с магазинами и отправили данные в класс представления
-            st = StoreViewItem(store.id, store.name_store, store.country, store.city, store.address,
-                               store.number_phone, store.number_stars, store.rating, store.size,
-                               store.store_network, store.open_hours, store.promotion_days, store.img)
+        for shop in base_shop:  # прошлись по таблице с магазинами и отправили данные в класс представления
+            st = StoreViewItem(shop.id, shop.name_store, shop.country, shop.city, shop.address, shop.number_phone,
+                               shop.number_stars, shop.rating, shop.size, shop.store_network, shop.open_hours,
+                               shop.promotion_days, shop.img, shop.latitude, shop.longitude, shop.link_shop)
             list_shop_presentation.append(st)
         return list_shop_presentation
 
@@ -162,9 +158,109 @@ class Catalog:
                             list_temp.append(shop)
         self.data['form_search'] = self.form_search
         self.data['form_filters'] = self.form_filters
-        self.data['list_shop_presentation'] = list_temp
+        self.data['list_shops_presentation'] = list_temp
         return render(request, 'main/catalog.html', context=self.data)
 
+
+class Stor:
+    db = DBInteractionHandler()
+
+    def __init__(self):
+        self.id_store = int()
+        self.store = None
+        self.data = dict()
+
+    def stor(self, request, id_store: int):
+        # a = ShopsDataController()
+        # a.start()
+        self.id_store = id_store
+        shop = self.db.get_shop(id_store)
+        store = StoreViewItem(shop.id, shop.name_store, shop.country, shop.city, shop.address, shop.number_phone,
+                              shop.number_stars, shop.rating, shop.size, shop.store_network, shop.open_hours,
+                              shop.promotion_days, shop.img, shop.latitude, shop.longitude, shop.link_shop)
+        print(self.id_store)
+        self.data = {
+            'store': store,
+            'img': id_store,
+            'photo': True,
+        }
+        return render(request, 'main/store.html', context=self.data)
+
+    def shop_map(self, request):
+        if request.GET['photo_or_map'] == 'Карта':
+            self.data['photo'] = False
+        else:
+            self.data['photo'] = True
+        self.data['data'] = json.dumps(
+            [
+                {
+                    'lat': self.data['store'].latitude,
+                    'lon': self.data['store'].longitude,
+                }
+            ]
+        )
+        return render(request, 'main/store.html', context=self.data)
+
+
+class Map:
+    db = DBInteractionHandler()
+
+    def __init__(self):
+        self.all_shop = self.db.base_shop
+
+    def map(self, request):
+        data = dict()
+        list_geolocation = list()
+        for i in range(5):
+            list_geolocation.append(self.get_geolocation(i))
+        data['data'] = json.dumps(list_geolocation)
+        return render(request, 'main/map.html', context=data)
+
+    def get_geolocation(self, condition):
+        list_temp = list()
+        if condition == 1:
+            condition = 'Мода Макс'
+        elif condition == 2:
+            condition = 'Эконом Сити'
+        elif condition == 3:
+            condition = 'Адзенне'
+        elif condition == 4:
+            condition = 'Мегахенд'
+        else:
+            condition = 'Все'
+
+        for shop in self.all_shop:
+            dict_temp = dict()
+            if condition == shop.name_store:
+                dict_temp['lat'] = shop.latitude
+                dict_temp['lon'] = shop.longitude
+                dict_temp['name'] = shop.name_store
+                dict_temp['address'] = shop.address
+                dict_temp['number_phone'] = shop.number_phone
+                list_temp.append(dict_temp)
+            elif condition == 'Все':
+                dict_temp['lat'] = shop.latitude
+                dict_temp['lon'] = shop.longitude
+                dict_temp['name'] = shop.name_store
+                dict_temp['address'] = shop.address
+                dict_temp['number_phone'] = shop.number_phone
+                list_temp.append(dict_temp)
+        return list_temp
+
+
+def about(request):
+    form_search = SearchForm()
+    form_filters = FiltersForm()
+    data = {
+        'form_search': form_search,
+        'form_filters': form_filters,
+        'list_name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
+    }
+    return render(request, 'main/about.html', context=data)
+
+
+def news(request):
+    return render(request, 'main/news.html')
 
 # class Index(ListView):
 #     template_name = 'main/index.html'
@@ -191,14 +287,6 @@ class Catalog:
 #     for store in mo_12:
 #         store.save()
 
-def map(request):
-    return render(request, 'main/map.html')
-
-
-def search(request):
-    return render(request, 'main/map.html')
-
-
 
 # class Store(ListView):
 #     template_name = 'main/store.html'
@@ -209,76 +297,3 @@ def search(request):
 #         context['set'] = OpenHours.objects.all()
 #         cur = datetime.now()
 #         return context
-
-
-class Stor:
-    def __init__(self):
-        self.id_store = int()
-        self.store = None
-        self.data = dict()
-
-    def stor(self, request, id_store: int):
-        # a = ShopsDataController()
-        # a.start()
-        self.id_store = id_store
-        store = None
-        # id_store = Stores.objects.get(id=id_store)
-        # store = StoreViewItem(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.address,
-        #                       id_store.number_phone, id_store.number_stars, id_store.rating, id_store.size,
-        #                       id_store.store_network, id_store.open_hours, id_store.promotion_days, id_store.img.image)
-        # print(self.id_store)
-        self.data = {
-            'store': store,
-            'img': id_store,
-            'photo': True,
-        }
-        return render(request, 'main/store.html', context=self.data)
-
-    def shop_map(self, request):
-        if request.GET['photo_or_map'] == 'Карта':
-            self.data['photo'] = False
-        else:
-            self.data['photo'] = True
-        self.data['data'] = json.dumps(
-            [
-                {
-                    'lat': 53.91221519598809,
-                    'lon': 27.599024188416895,
-                }
-            ]
-        )
-        return render(request, 'main/store.html', context=self.data)
-
-
-def all_shop(request):
-    # id_store = Stores.objects.get(id=3)
-    # store = Store(id_store.id, id_store.name_store, id_store.country, id_store.city, id_store.address,
-    #               id_store.number_phone, id_store.number_stars, id_store.rating,
-    #               id_store.store_network, id_store.open_hours)
-    # data = {
-    #     'store': store,
-    # }
-    return render(request, 'main/all_shop.html')
-
-
-def login(request):
-    return render(request, 'main/login.html')
-
-
-def about(request):
-    form_search = SearchForm()
-    form_filters = FiltersForm()
-    data = {
-        'form_search': form_search,
-        'form_filters': form_filters,
-        'list_name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
-    }
-    return render(request, 'main/about.html', context=data)
-
-
-def news(request):
-    return render(request, 'main/news.html')
-
-
-def forum(request):
-    return render(request, 'main/forum.html')

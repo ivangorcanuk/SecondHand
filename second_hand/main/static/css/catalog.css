@@ -1,6 +1,3 @@
-.filter {
-    margin-left: 30px; /* отступ слева */
-}
 .str {
     display: flex;
 }
@@ -17,10 +14,24 @@
 }
 .one-row {
     display: flex;
-    margin-right: 50px;
+}
+.cont-shop {
+    display: flex;
+    transition: color 0.3s linear;
+    margin-right: 80px;
+}
+.cont-shop:hover {
+    background: #F2F3F4 /* меняет цвет при наведении мыши */
 }
 .indentation {
     margin-right: 30px; /* отступы */
+}
+.cont-inf-shop {
+    width: 150px;
+    height: 200px;
+    background-color: #d3d3d3;
+    margin-right: 30px; /* отступы (не работают) */
+    margin-left: 30px; /* отступ слева */
 }
 .indentationleft {
     margin-left: 30px; /* отступ слева */
@@ -28,5 +39,7 @@
 .cont-day {
     width: 100px;
     height: 120px;
-    background-color: #333;
+    /*background-color: #d3d3d3;*/
+    margin-right: 10px; /* отступы */
+    text-align: center
 }

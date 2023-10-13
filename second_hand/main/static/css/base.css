@@ -8,7 +8,7 @@
     margin-right: 30px;
 }
 .hat-style-elements:hover {
-    color: #177245 /* меняет цвет при наведении мыши */
+    color: #177245; /* меняет цвет при наведении мыши */
 }
 .hat-style-elements {
     color: #000000; /* цвет */

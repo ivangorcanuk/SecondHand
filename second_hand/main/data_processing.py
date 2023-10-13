@@ -47,7 +47,7 @@ class DataProcessorBase:
                     else:
                         dict_schedule = self.build_schedule(i, converted_timetable, dict_schedule)
                 else:
-                    dict_schedule[self.list_week[i]] = None
+                    dict_schedule[self.list_week[i]] = [None, None]
 
         return dict_schedule
 
@@ -62,11 +62,12 @@ class ModaMaxParserDataProcessor(DataProcessorBase):
             dict_schedule = DataProcessorBase.get_schedule(self, value[-1].text)
             dict_discounts = self.get_discount(value[:-1])
             self._list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
-            print(key)
-            for key, value in dict_schedule.items():
-                print(key, value)
-            for key, value in dict_discounts.items():
-                print(key, value)
+            if key == 'ул. Нёманская, 85':
+                print(key)
+                for key, value in dict_schedule.items():
+                    print(key, value)
+                for key, value in dict_discounts.items():
+                    print(key, value)
         return self._list_shops
 
     def get_discount(self, many_descaunt):

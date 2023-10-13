@@ -1,33 +1,25 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>Быстрый старт. Размещение интерактивной карты на странице</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=17f348d1-c049-43ed-bf02-73116330dd7b&lang=ru_RU">
-    </script>
-    <script src="static/js/script_shops_map.js"></script>
-    <style>
-        .map-container {
-            width: 600px;
-            height: 400px;
-            background-color: #333;
-        }
-        [class*="copyrights-pane"] {
-            display: none !important;
-        }
-        .category-button {
-            padding: 10px;
-            margin-right: 10px;
-            cursor: pointer;
-        }
-    </style>
-</head>
+{% extends 'main/base.html' %}
 
-<body>
-    <div id="map-shops" class="map-container"></div>
+{% block title %}
+Карта
+{% endblock %}
+
+{% load static %}
+
+{% block css_additional %}
+    <div style="display: none" id="jsonData" data-json="{{ data }}"></div>
+    <script src="https://api-maps.yandex.ru/2.1/?apikey=17f348d1-c049-43ed-bf02-73116330dd7b&lang=ru_RU" type="text/javascript"></script>
+    <script src='static/js/script_shops_map.js' type="text/javascript"></script>
+
+{% endblock %}
+
+{% block content %}
+    <div style="width: 600px; height: 400px" id="map-shops" class="map-container"></div>
     <div>
-        <button class="category-button" data-category="category1">Мода Макс</button>
-        <button class="category-button" data-category="category2">Эконом Сити</button>
-        <button class="category-button" data-category="category3">Адзенне</button>
+        <button class="category-button" data-category="category1">Все магазины</button>
+        <button class="category-button" data-category="category2">Мода Макс</button>
+        <button class="category-button" data-category="category3">Эконом Сити</button>
+        <button class="category-button" data-category="category4">Адзенне</button>
+        <button class="category-button" data-category="category5">Мегахенд</button>
     </div>
-</body>
+{% endblock %}

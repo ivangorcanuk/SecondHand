@@ -4,24 +4,28 @@ from pytils.translit import slugify
 import datetime
 
 
-class StoreNetwork(models.Model):  # сети магазинов
-    name_network = models.CharField(max_length=50)  # название сети магазинов
-    discount_card = models.CharField(max_length=50)  # дисконтная карта
-    description = models.TextField()  # описание
-
-    def __str__(self):
-        return f'{self.name_network}'
-
-
 class LinkSocNetworks(models.Model):  # ссылки на соц сети и официальный сайт
-    link = models.URLField(blank=True)
+    link_home_page = models.URLField(blank=True)  # website
     inst = models.URLField(blank=True)
     vk = models.URLField(blank=True)
     tik_tok = models.URLField(blank=True)
     classmates = models.URLField(blank=True)
     facebook = models.URLField(blank=True)
     telegram = models.URLField(blank=True)
-    name_network = models.ForeignKey(StoreNetwork, on_delete=models.CASCADE, null=True)  # id сети магазинов
+
+    def __str__(self):
+        return f'{self.link_home_page}'
+
+
+class StoreNetwork(models.Model):  # сети магазинов
+    name_network = models.CharField(max_length=50)  # название сети магазинов
+    discount_card = models.CharField(max_length=50)  # дисконтная карта
+    description = models.TextField()  # описание
+    image = models.FileField(upload_to='store_network_logo', null=True, blank=True)
+    links = models.ForeignKey(LinkSocNetworks, on_delete=models.CASCADE, null=True)  # id сети магазинов
+
+    def __str__(self):
+        return f'{self.name_network}'
 
 
 class Gallery(models.Model):
@@ -54,6 +58,8 @@ class PromotionsRegister(models.Model):  # все возможные акции 
     value = models.CharField(max_length=50, null=True, blank=True)
     general_promotions = models.CharField(max_length=50, null=True, blank=True)  # УБРАТЬ blank=True, пересмотреть on_delete=models.CASCADE
     decoding = models.TextField(null=True, blank=True)
+    image = models.FileField(upload_to='sale_gallery', null=True, blank=True)
+    discount_type = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
         return f'{self.promotion_name}'
@@ -84,9 +90,10 @@ class Stores(models.Model):  # магазины
     store_network = models.ForeignKey(StoreNetwork, on_delete=models.CASCADE, null=True, blank=True)  # id сети магазинов которой он принадлежит
     open_hours = models.ForeignKey(OpenHours, on_delete=models.CASCADE, null=True, blank=True)  # id времени работы
     promotion_days = models.ForeignKey(PromotionDays, on_delete=models.CASCADE, null=True, blank=True)  # id скидок
-    img = models.ForeignKey(Gallery, on_delete=models.PROTECT, null=True, blank=True)  # id скидок
+    img = models.ForeignKey(Gallery, on_delete=models.PROTECT, null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
     longitude = models.FloatField(null=True, blank=True)
+    link_shop = models.URLField(null=True, blank=True)
     #slug = models.SlugField(default='', null=False)
 
     def __str__(self):

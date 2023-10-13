@@ -4,7 +4,7 @@ from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, PromotionD
 
 @admin.register(StoreNetwork)
 class StoreNetwork(admin.ModelAdmin):
-    list_display = ['id', 'name_network', 'discount_card', 'description']
+    list_display = ['name_network', 'discount_card', 'description']
     #list_editable = ['name_network']  # список изменения полей
 
     def __str__(self):
@@ -13,11 +13,11 @@ class StoreNetwork(admin.ModelAdmin):
 
 @admin.register(LinkSocNetworks)
 class LinkSocNetworks(admin.ModelAdmin):
-    list_display = ['link', 'inst', 'vk', 'tik_tok', 'classmates', 'facebook', 'telegram']
+    list_display = ['link_home_page', 'inst', 'vk', 'tik_tok', 'classmates', 'facebook', 'telegram']
     #list_editable = ['discount_card', 'description']  # список изменения полей
 
     def __str__(self):
-        return f'{self.link} - {self.inst} - {self.vk} - {self.tik_tok} - {self.classmates} - {self.facebook} - {self.telegram}'
+        return f'{self.link_home_page} - {self.inst} - {self.vk} - {self.tik_tok} - {self.classmates} - {self.facebook} - {self.telegram}'
 
 
 @admin.register(Stores)
@@ -67,7 +67,7 @@ class Gallery(admin.ModelAdmin):
 
 @admin.register(PromotionsRegister)
 class PromotionsRegister(admin.ModelAdmin):
-    list_display = ['id', 'promotion_name', 'store_network', 'value', 'general_promotions', 'decoding']
+    list_display = ['id', 'promotion_name', 'store_network', 'value', 'general_promotions', 'discount_type', 'decoding']
     #list_editable = ['number_stars', 'rating']  # список изменения полей
 
     def __str__(self):

@@ -11,55 +11,53 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
+<div class="container my-container">
+    <div class="container__discounts__all">
         {% for discount in list_social_discounts %}
             <div class="col-sm">
                 <a class="hat-style-discounts" href="{% url 'pensioner' discount %}">{{ discount }}</a>
             </div>
         {% endfor %}
     </div>
-</div>
-<hr>
-<div class="one-row">
-    <div class="indentation">
-        <form action="{% url 'filter' %} " method="get">
-            <div>
-                <h6>Сеть магазина</h6>
-                    {{ form_filters.checkbox_network_moda_max }}<label>{{ form_filters.checkbox_network_moda_max.label }}</label><br>
-                    {{ form_filters.checkbox_network_economy_city }}<label>{{ form_filters.checkbox_network_economy_city.label }}</label><br>
-                    {{ form_filters.checkbox_network_adzenne }}<label>{{ form_filters.checkbox_network_adzenne.label }}</label><br>
-                    {{ form_filters.checkbox_network_megahand }}<label>{{ form_filters.checkbox_network_megahand.label }}</label><br>
-            </div>
-            <br>
-            <div>
-                <h6>Размер магазина</h6>
-                    {{ form_filters.checkbox_size_S }}<label>{{ form_filters.checkbox_size_S.label }}</label><br>
-                    {{ form_filters.checkbox_size_M }}<label>{{ form_filters.checkbox_size_M.label }}</label><br>
-                    {{ form_filters.checkbox_size_L }}<label>{{ form_filters.checkbox_size_L.label }}</label><br>
-            </div>
-            <br>
-            <div>
-                <h6>Скидки</h6>
-                    {{ form_filters.combobox_sales }}
-            </div>
-            <br>
-            <div>
-                <h6>Акции</h6>
-                    {{ form_filters.combobox_discounts }}
-            </div>
-            <br>
-            <div>
-                <h6>Дата</h6>
-                    {{ form_filters.date }}<br><br>
-            </div>
-            <div>
-                <button type="submit">Применить</button>
-            </div>
-        </form>
-    </div>
-    <div class="verticalLine">
-        <div class="indentationleft">
+    <hr>
+    <div class="one-row">
+        <div class="filter">
+            <form action="{% url 'filter' %} " method="get">
+                <div>
+                    <h6>Сеть магазина</h6>
+                        {{ form_filters.checkbox_network_moda_max }}<label>{{ form_filters.checkbox_network_moda_max.label }}</label><br>
+                        {{ form_filters.checkbox_network_economy_city }}<label>{{ form_filters.checkbox_network_economy_city.label }}</label><br>
+                        {{ form_filters.checkbox_network_adzenne }}<label>{{ form_filters.checkbox_network_adzenne.label }}</label><br>
+                        {{ form_filters.checkbox_network_megahand }}<label>{{ form_filters.checkbox_network_megahand.label }}</label><br>
+                </div>
+                <br>
+                <div>
+                    <h6>Размер магазина</h6>
+                        {{ form_filters.checkbox_size_S }}<label>{{ form_filters.checkbox_size_S.label }}</label><br>
+                        {{ form_filters.checkbox_size_M }}<label>{{ form_filters.checkbox_size_M.label }}</label><br>
+                        {{ form_filters.checkbox_size_L }}<label>{{ form_filters.checkbox_size_L.label }}</label><br>
+                </div>
+                <br>
+                <div>
+                    <h6>Скидки</h6>
+                        {{ form_filters.combobox_sales }}
+                </div>
+                <br>
+                <div>
+                    <h6>Акции</h6>
+                        {{ form_filters.combobox_discounts }}
+                </div>
+                <br>
+                <div>
+                    <h6>Дата</h6>
+                        {{ form_filters.date }}<br><br>
+                </div>
+                <div>
+                    <button type="submit">Применить</button>
+                </div>
+            </form>
+        </div>
+        <div class="verticalLine">
             {% for shop in list_shops_presentation %}
 
                 <div class="cont-shop">
@@ -68,10 +66,10 @@
                     </div>
 
                     <div class="cont-inf-shop">
-                        <h5><a href="{% url 'store' shop.id %}">{{ shop.name_store }} {{ shop.name_rating }}</a></h5>
-                        <p>{{ shop.city }},<br> {{ shop.address }}</p>
-                        <p>Размер магазина: {{ shop.size }}</p>
-                        <p>{{ shop.opening_hours_today_text }}</p>
+                        <a class="shop__name" href="{% url 'store' shop.id %}">{{ shop.name_store }}</a>
+                        <p>{{ shop.address }}<br>
+                            Размер магазина: {{ shop.size }}<br>
+                            Сегодня: {{ shop.opening_hours_today_text }}</p>
                     </div>
 
                     <div class="one-row">
@@ -100,6 +98,7 @@
                         {% endfor %}
                     </div>
                 </div>
+            <hr>
             {% endfor %}
         </div>
     </div>

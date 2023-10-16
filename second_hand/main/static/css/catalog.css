@@ -1,5 +1,25 @@
+                               /* general */
+.my-container {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+}
+.one-row {
+    display: flex;
+}
 .str {
     display: flex;
+}
+.verticalLine {
+    border-left: 1px solid grey;
+    height: 100%;
+    margin-right: 30px; /* отступы */
+}
+                               /* quick discounts */
+.container__discounts__all {
+    display: flex; /* размемтил элементы шапки в ряд */
+    padding-top: 20px; /* отступил от верха */
+    margin-bottom: 20px; /* отступил вниз */
 }
 .hat-style-discounts {
     color: #000000; /* цвет */
@@ -7,33 +27,28 @@
     font-weight: 500; /* жирный шрифт */
     font-size: 18px; /* размер шрифта */
     transition: color 0.3s linear; /* плавность изменения цветы при наведении маши */
-    }
-.verticalLine {
-    border-left: 2px solid grey;
-    height: 100%;
 }
-.one-row {
-    display: flex;
+                               /* filter */
+.filter {
+    padding-top: 20px; /* отступил от верха */
+    margin-right: 30px; /* отступы в право */
+    margin-left: 1px; /* отступ слева */
 }
+
+                               /* catalog */
 .cont-shop {
     display: flex;
     transition: color 0.3s linear;
-    margin-right: 80px;
+    margin-left: 30px; /* отступ слева */
+    padding-top: 10px; /* отступил от верха */
 }
 .cont-shop:hover {
     background: #F2F3F4 /* меняет цвет при наведении мыши */
 }
-.indentation {
-    margin-right: 30px; /* отступы */
-}
 .cont-inf-shop {
-    width: 150px;
-    height: 200px;
-    background-color: #d3d3d3;
-    margin-right: 30px; /* отступы (не работают) */
-    margin-left: 30px; /* отступ слева */
-}
-.indentationleft {
+    width: 226px;
+    height: 130px;
+    /*background-color: #d3d3d3;*/
     margin-left: 30px; /* отступ слева */
 }
 .cont-day {
@@ -57,4 +72,11 @@
     font-size: 11px; /* Размер текста подсказки */
     padding: 5px 10px; /* Поля */
     border: 1px solid #333; /* Параметры рамки */
+}
+.shop__name {
+    color: #000000; /* цвет */
+    text-decoration: none; /* убрал подчеркивание */
+    font-weight: 500; /* жирный шрифт */
+    font-size: 18px; /* размер шрифта */
+    transition: color 0.3s linear; /* плавность изменения цветы при наведении маши */
 }

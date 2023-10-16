@@ -1,6 +1,7 @@
 .cap {
     display: flex; /* размемтил элементы шапки в ряд */
     padding-top: 10px; /* отступил от верха */
+    margin-bottom: 10px; /* отступил вниз */
     align-items: center; /* выравнял элементы по центру картинки */
 }
 .logo {
@@ -18,3 +19,4 @@
     margin-right: 30px; /* отступы */
     transition: color 0.3s linear; /* плавность изменения цветы при наведении маши */
 }
+hr {margin: 0; padding: 0;}

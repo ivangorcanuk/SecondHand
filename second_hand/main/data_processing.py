@@ -62,7 +62,7 @@ class ModaMaxParserDataProcessor(DataProcessorBase):
             dict_schedule = DataProcessorBase.get_schedule(self, value[-1].text)
             dict_discounts = self.get_discount(value[:-1])
             self._list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
-            if key == 'ул. Нёманская, 85':
+            if key == 'ул. Веры Хоружей, 8':
                 print(key)
                 for key, value in dict_schedule.items():
                     print(key, value)
@@ -195,6 +195,10 @@ class AdzenneParserDataProcessor(DataProcessorBase):
         ('Крама па вул. В. Харужай, 8', 'ул. Веры Хоружей, 8')
     ]
 
+    def __init__(self):
+        DataProcessorBase.__init__(self)
+        self.__exception_shortened_day = str()  # исключение работы магазина в день полной смены товара
+
     def get_network_name(self):
         return 'Адзенне'
 
@@ -206,11 +210,12 @@ class AdzenneParserDataProcessor(DataProcessorBase):
             dict_discounts = self.get_discount(value[:-1])
             dict_schedule = self.update_special_day(dict_discounts, dict_schedule)
             self._list_shops.append(ShopsData(street, dict_schedule, dict_discounts))
-            print(street)
-            for key, value in dict_schedule.items():
-                print(key, value)
-            for key, value in dict_discounts.items():
-                print(key, value)
+            if street == 'ул. Веры Хоружей, 8':
+                print(street)
+                for key, value in dict_schedule.items():
+                    print(key, value)
+                for key, value in dict_discounts.items():
+                    print(key, value)
         return self._list_shops
 
     def translate_street_bel(self, street_by):
@@ -260,20 +265,24 @@ class AdzenneParserDataProcessor(DataProcessorBase):
             converted_timetable = re.search(r'.*\d', converted_timetable)
             converted_timetable = converted_timetable.group(0)
         converted_timetable = self.translate_from_bel(converted_timetable)
+        temp_time = re.search(r'\d\d.\d\d', converted_timetable)
+        self.__exception_shortened_day = temp_time.group(0)
 
         return DataProcessorBase.get_schedule(self, converted_timetable)
 
     def update_special_day(self, dict_discounts, dict_schedule):
-        i = 0  # счетчик дней, до 'Полной смены товара'
+        i = 0  # счетчик дней
         for key, value in dict_discounts.items():
             if '/Х' in value[0]:
                 finish = re.search(r'(\d*).Х', value[0])
                 finish = finish.group(1) + ':' + '00'
                 monday = date.today() - timedelta(days=date.weekday(date.today()))  # вернули понедельник
                 dat = str(monday + timedelta(days=i))
+                str_datetime_start = dat + ' ' + self.__exception_shortened_day
                 str_datetime_finsh = dat + ' ' + finish
+                date_time_start = datetime.strptime(str_datetime_start, '%Y-%m-%d %H:%M')
                 date_time_finsh = datetime.strptime(str_datetime_finsh, '%Y-%m-%d %H:%M')
-                dict_schedule[key][1] = date_time_finsh  # изменили время конца рабочего дня
+                dict_schedule[key] = [date_time_start, date_time_finsh]  # изменили время конца рабочего дня
                 if len(value[0]) == 4:
                     dict_discounts[key] = ['']
                 if len(value[0]) > 4:

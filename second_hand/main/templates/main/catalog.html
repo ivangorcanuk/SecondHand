@@ -83,12 +83,16 @@
                                 {% if value.0.0 %}
                                 <p>{{ value.0.0.general_promotions }}</p>
                                 {% else %}
-                                <p>' '</p>
+                                <p>&nbsp;</p>
                                 {% endif %}
 
                                 {% if value.1 %}
                                     {% for prom in value.1 %}
-                                        <img src="{{ prom.image }}" width="30" height="30">
+                                        {% if prom.image %}
+                                            <div class="photo" data-title="{{ prom.general_promotions }}">
+                                                <img src="{{ prom.image.url }}" width="30" height="30">
+                                            </div>
+                                        {% endif %}
                                     {% endfor %}
                                 {% endif %}
                             </div>

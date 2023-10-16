@@ -50,7 +50,7 @@ class StoreViewItem:
         self.opening_hours_today_text = self.get_todays_open_hours()  # готовая строка для отображения рабочего времени
         self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
         self.list_promotion_days = self.get_promotion_list_by_id()
-        #self.list_catalog_prom_days = self.list_promotion_days[datetime.weekday(date.today()):len(self.list_promotion_days)]
+        # #self.list_catalog_prom_days = self.list_promotion_days[datetime.weekday(date.today()):len(self.list_promotion_days)]
         self.dict_catalog_prom_days = self.converted_to_dict(self.list_promotion_days)
 
     def get_todays_open_hours(self):
@@ -107,19 +107,18 @@ class StoreViewItem:
 
     def get_promotion_list_by_id(self):
         list_temp = list()
-        # if self.address == 'ул. Нёманская, 85':
-        #     print(self.list_promotion)
+        print('')
+        print(self.address)
+        print(self.list_promotion)
         for i in range(len(self.list_promotion)):  # проходим по списку с id скидок
             list_promotion = list()
-            #list_promotion.append(self.list_week[i])
-            if self.list_promotion[i] == '':
-                list_promotion.append('Нет скидки')
-            else:
+            if self.list_promotion[i]:
                 list_id_promotion = self.list_promotion[i].split('*')  # разбили склеиный элемент и поместили в отдельный список
                 for j in list_id_promotion:
                     promotion = self.db.get_sale_id(int(j))
                     list_promotion.append(promotion)
-            list_temp.append(tuple(list_promotion))
+            list_temp.append(list_promotion)
+        print(list_temp)
         return list_temp
 
     # def converted_to_dict(self, list_promotion_days):
@@ -130,27 +129,22 @@ class StoreViewItem:
 
     def converted_to_dict(self, list_promotion_days):
         dict_catalog_prom_days = dict()
-        # print(self.name_store, self.address)
 
         for i in range(len(self.list_week)):
             list_temp_sales = list()
             list_temp_discounts = list()
-            for j in range(len(list_promotion_days[i])):
-                if list_promotion_days[i][j] == 'Нет скидки':
-                    continue
-                elif list_promotion_days[i][j].discount_type == 'скидка':
-                    list_temp_sales.append(list_promotion_days[i][j])
-                else:
-                    list_temp_discounts.append(list_promotion_days[i][j])
-            # if not list_temp_sales:  # добавляем пустую строку, чтобы при отображении картинки не залазили на скидки
-            #     list_temp_sales.append(' ')
+            for prom in list_promotion_days[i]:
+                if prom.discount_type == 'скидка':
+                    list_temp_sales.append(prom)
+                elif prom.discount_type == 'акция':
+                    list_temp_discounts.append(prom)
             dict_catalog_prom_days[self.list_week[i]] = [list_temp_sales, list_temp_discounts]
 
-        # for key, value in dict_catalog_prom_days.items():
-        #     print(key)
-        #     print(value[0])
-        #     print(value[1])
-        # print('--------------------------------')
+        for key, value in dict_catalog_prom_days.items():
+            print(key)
+            print(value)
+
+        print('--------------------------------')
         return dict_catalog_prom_days
 
     def get_package_links(self, store_network):

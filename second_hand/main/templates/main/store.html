@@ -40,41 +40,62 @@
             </div>
         </div>
         <div class="col-sm">
-            <div>
-                <form action="{% url 'shop' %}" method="get">
-                    <div>
-                        <input type="submit" value="Фото" name="photo_or_map" {% if photo %} disabled {% endif %}></input>
-                        <input type="submit" value="Карта" name="photo_or_map" {% if not photo %} disabled {% endif %}></input>
+            <div class="container__img">
+                {% if photo %}
+                    <div class="">
+                        <img src="{{ store.img.image.url }}" alt="Snow" style="width:100%">
                     </div>
-                </form>
-            </div>
-            {% if photo %}
+                {% else %}
+                    <div class="map-shop" id="map"></div>
+                {% endif %}
                 <div>
-                    <img src="{{ store.img.image.url }}" height="400" width="600">
+                    <form action="{% url 'shop' %}" method="get">
+                        <div>
+                            <input type="submit" class="btn__photo" value="Фото" name="photo_or_map" {% if photo %} disabled {% endif %}></input>
+                            <input type="submit" class="btn__map" value="Карта" name="photo_or_map" {% if not photo %} disabled {% endif %}></input>
+                        </div>
+                    </form>
                 </div>
-            {% else %}
-                <div class="map-shop" id="map"></div>
-            {% endif %}
+            </div>
         </div>
     </div>
 </div><br>
-<div class="container">
-    <div class="row">
-    {% for inf in store.list_week %}
-        <div class="col-sm">
-            <h3>{{ inf }}</h3>
+<div class="container__promotions">
+    {% for key, value in store.dict_catalog_prom_days.items %}
+        <div class="cont-day">
+            {% if key == today %}
+                <div class="day">
+                    <h4>{{ key }}</h4>
+                </div>
+            {% else %}
+                <h4>{{ key }}</h4>
+            {% endif %}
+
+            {% if value.0.0 %}
+                <h6>{{ value.0.0.general_promotions }}</h6>
+            {% else %}
+                <h6>&nbsp;</h6>
+            {% endif %}
+
+            {% if value.1 %}
+                {% for prom in value.1 %}
+                    {% if prom.gallery.image %}
+                        <div class="photo" data-title="{{ prom.general_promotions }}">
+                            <img src="{{ prom.gallery.image.url }}" width="40" height="40">
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
         </div>
     {% endfor %}
-    </div>
-    <hr>
-    <div class="row">
-    {% for inf in store.list_promotion_days %}
-        <div class="col-sm">
-            {% for price in inf %}
-                <h6>{{ price }}</h6>
-             {% endfor %}
-        </div>
-    {% endfor %}
-    </div>
 </div>
+<br>
+    {% for value in store.dict_catalog_prom_days.values %}
+        {% for sale in value.1 %}
+            <div class="discount__information">
+                <img src="{{ sale.gallery.image.url }}" width="40" height="40">
+                <p>{{ sale.decoding }}</p>
+            </div>
+        {% endfor %}
+    {% endfor %}
 {% endblock %}

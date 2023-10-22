@@ -6,6 +6,10 @@ function loadJson(selector) {
 function init() {
     var jsonData = loadJson('#jsonData');
 
+    var name = jsonData.map((item) => item.name);
+    var address = jsonData.map((item) => item.address);
+    var phone = jsonData.map((item) => item.phone);
+    var time_work = jsonData.map((item) => item.time_work);
     var lat = jsonData.map((item) => item.lat);
     var lon = jsonData.map((item) => item.lon);
 
@@ -15,19 +19,9 @@ function init() {
     });
 
     let placemark = new ymaps.Placemark([lat, lon], {
-//        balloonContentHeader: 'Эконом Сити',
-//        balloonContentBody: 'ул. Долгобродская, 3',
-//        balloonContentFooter: '+375(29)803-21-68',
-        balloonContent: `
-
-        <div class="balloon">
-            <div class="balloon__address">Магаз</div>
-            <div class="balloon__contains">
-                <a href="">ссылка</a>
-            </div>
-        </div>
-
-        `
+        balloonContentHeader: name,
+        balloonContentBody: address,
+        balloonContentFooter: time_work,
         },{
         iconLayout: 'default#image', // указали, что будем использовать свой стиль для метки
         iconImageHref: 'static/img/map-point.png', // используем выбранный нами стиль метки

@@ -1,7 +1,12 @@
+.asd {
+    height: 90px;
+    box-shadow: 10px 5px 10px 5px #0000001A; /* тени */
+}
 .cap {
     display: flex; /* размемтил элементы шапки в ряд */
     padding-top: 10px; /* отступил от верха */
     margin-bottom: 10px; /* отступил вниз */
+    margin-left: 100px;
     align-items: center; /* выравнял элементы по центру картинки */
 }
 .logo {
@@ -20,3 +25,11 @@
     transition: color 0.3s linear; /* плавность изменения цветы при наведении маши */
 }
 hr {margin: 0; padding: 0;}
+.my-container {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+}
+.one-row {
+    display: flex;
+}

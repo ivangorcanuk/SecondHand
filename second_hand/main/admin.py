@@ -67,7 +67,8 @@ class Gallery(admin.ModelAdmin):
 
 @admin.register(PromotionsRegister)
 class PromotionsRegister(admin.ModelAdmin):
-    list_display = ['id', 'promotion_name', 'store_network', 'value', 'general_promotions', 'discount_type', 'decoding', 'image']
+    list_display = ['id', 'promotion_name', 'store_network', 'value',
+                    'general_promotions', 'discount_type', 'decoding', 'gallery']
     #list_editable = ['number_stars', 'rating']  # список изменения полей
 
     def __str__(self):

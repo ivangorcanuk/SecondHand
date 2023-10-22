@@ -1,21 +1,17 @@
                                /* general */
-.my-container {
-    max-width: 100%;
-    margin-left: 0;
-    margin-right: 0;
-}
-.one-row {
-    display: flex;
-}
-.str {
-    display: flex;
-}
-.verticalLine {
+.vertical__line {
     border-left: 1px solid grey;
     height: 100%;
-    margin-right: 30px; /* отступы */
+}
+                                /* search */
+.search {
+    display: flex;
+    margin-left: 200px;
 }
                                /* quick discounts */
+.col-sm {
+    text-align: center;
+}
 .container__discounts__all {
     display: flex; /* размемтил элементы шапки в ряд */
     padding-top: 20px; /* отступил от верха */
@@ -32,14 +28,22 @@
 .filter {
     padding-top: 20px; /* отступил от верха */
     margin-right: 30px; /* отступы в право */
-    margin-left: 1px; /* отступ слева */
+    margin-left: 50px; /* отступ слева */
 }
 
                                /* catalog */
+.today {
+    color: #C0C0C0; цвет */
+}
+.img__shop {
+    margin-left: 30px; /* отступ слева */
+}
+.day {
+    color: red; /* цвет */
+}
 .cont-shop {
     display: flex;
     transition: color 0.3s linear;
-    margin-left: 30px; /* отступ слева */
     padding-top: 10px; /* отступил от верха */
 }
 .cont-shop:hover {
@@ -58,7 +62,7 @@
     margin-right: 10px; /* отступы */
     text-align: center
 }
-.photo {
+.img__sale {
     display: inline-block; /* Строчно-блочный элемент */
     position: relative; /* Относительное позиционирование */
 }

@@ -100,16 +100,11 @@ class StoreViewItem:
 
         for i in range(len(list_days_open_hours)):
             list_days_open_hours[i] = list_days_open_hours[i].replace('00:00 - 00:00', 'Выходной')
-        # for schedule in list_days_open_hours:
-        #     print(schedule)
 
         return list_days_open_hours
 
     def get_promotion_list_by_id(self):
         list_temp = list()
-        print('')
-        print(self.address)
-        print(self.list_promotion)
         for i in range(len(self.list_promotion)):  # проходим по списку с id скидок
             list_promotion = list()
             if self.list_promotion[i]:
@@ -118,14 +113,8 @@ class StoreViewItem:
                     promotion = self.db.get_sale_id(int(j))
                     list_promotion.append(promotion)
             list_temp.append(list_promotion)
-        print(list_temp)
-        return list_temp
 
-    # def converted_to_dict(self, list_promotion_days):
-    #     dict_catalog_prom_days = dict()
-    #     for i in range(len(list_promotion_days)):
-    #         dict_catalog_prom_days[self.list_week[i]] = list_promotion_days[i]
-    #     return dict_catalog_prom_days
+        return list_temp
 
     def converted_to_dict(self, list_promotion_days):
         dict_catalog_prom_days = dict()
@@ -140,11 +129,6 @@ class StoreViewItem:
                     list_temp_discounts.append(prom)
             dict_catalog_prom_days[self.list_week[i]] = [list_temp_sales, list_temp_discounts]
 
-        for key, value in dict_catalog_prom_days.items():
-            print(key)
-            print(value)
-
-        print('--------------------------------')
         return dict_catalog_prom_days
 
     def get_package_links(self, store_network):

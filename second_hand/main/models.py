@@ -31,6 +31,9 @@ class StoreNetwork(models.Model):  # сети магазинов
 class Gallery(models.Model):
     image = models.FileField(upload_to='shop_gallery')
 
+    def __str__(self):
+        return f'{self.image}'
+
 
 class OpenHours(models.Model):  # рабочее время
     mon_st = models.DateTimeField(null=True, blank=True)
@@ -58,7 +61,7 @@ class PromotionsRegister(models.Model):  # все возможные акции 
     value = models.CharField(max_length=50, null=True, blank=True)
     general_promotions = models.CharField(max_length=50, null=True, blank=True)  # УБРАТЬ blank=True, пересмотреть on_delete=models.CASCADE
     decoding = models.TextField(null=True, blank=True)
-    image = models.FileField(upload_to='sale_gallery', null=True, blank=True)
+    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, null=True, blank=True)
     discount_type = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):

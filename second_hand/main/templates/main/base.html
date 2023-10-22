@@ -16,7 +16,7 @@
 <body>
 
     <header>
-        <div class="container">
+        <div class="asd">
             <div class="cap">
                 <div class="logo">
                     <a href="{% url 'home' %}">
@@ -28,7 +28,7 @@
                 <a class="hat-style-elements" href="{% url 'news' %}">Новости</a>
                 {% if search %}
                     <form action="{% url 'search' %}" method="get">
-                        <div class="str">
+                        <div class="search">
                         {{ form_search.search }}
                         <button type="submit">Поиск</button>
                             </div>
@@ -37,8 +37,7 @@
             </div>
         </div>
     </header>
-    <hr>
-<div class="container">
+<div class="container my-container">
     {% block content %}{% endblock %}
 </div>
 

@@ -50,6 +50,7 @@ class Catalog:
     def catalog(self, request):
         self.data['form_filters'] = self.form_filters
         self.data['list_shops_presentation'] = self.list_shops
+        self.data['today'] = StoreViewItem.list_week[datetime.weekday(date.today())]
         return render(request, 'main/catalog.html', context=self.data)
 
     def handle_search(self, request):
@@ -183,6 +184,7 @@ class Stor:
             'store': store,
             'img': id_store,
             'photo': True,
+            'today': StoreViewItem.list_week[datetime.weekday(date.today())]
         }
         return render(request, 'main/store.html', context=self.data)
 
@@ -194,6 +196,10 @@ class Stor:
         self.data['data'] = json.dumps(
             [
                 {
+                    'name': self.data['store'].name_store,
+                    'address': self.data['store'].address,
+                    'phone': self.data['store'].number_phone,
+                    'time_work': self.data['store'].opening_hours_today_text,
                     'lat': self.data['store'].latitude,
                     'lon': self.data['store'].longitude,
                 }

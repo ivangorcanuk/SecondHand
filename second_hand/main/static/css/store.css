@@ -9,6 +9,74 @@
     display: flex; /* размемтил элементы шапки в ряд */
     margin-right: 30px; /* отступы */
 }
-.colort {
-    color: red;
+.cont-day {
+    box-shadow: 10px 10px 40px 20px #0000001A; /* тени */
+    /* background-color: #d3d3d3; */
+    width: 90px;
+    height: 120px;
+    text-align: center;
+    margin-left: 5px; /* отступ слева */
+    margin-right: 30px; /* отступ слева */
+    padding-top: 10px; /* отступил от верха */
+}
+.photo {
+    display: inline-block; /* Строчно-блочный элемент */
+    position: relative; /* Относительное позиционирование */
+}
+.day {
+    color: red; /* цвет */
+}
+.container__promotions {
+    display: flex;
+    justify-content: center;
+}
+.discount__information {
+    display: flex;
+    align-items: center; /* выравнял элементы по центру картинки */
+}
+.container__img {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+}
+
+.container__img {
+    width: 100%;
+    height: auto;
+}
+
+.container__img .btn__photo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(120%, -400%);
+    -ms-transform: translate(-50%, -50%);
+    background-color: #555;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.container__img .btn__map {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(220%, -400%);
+    -ms-transform: translate(-50%, -50%);
+    background-color: #555;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.container__img .btn__photo:hover {
+    background-color: black;
+}
+.container__img .btn__map:hover {
+    background-color: black;
 }

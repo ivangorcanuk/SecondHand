@@ -19,35 +19,53 @@
 {% block content %}
 
 <div class="container">
-    <div class="row">
-        <div class="col-sm">
+    <div class="container__information__and__image">
+        <div class="store__information">
             <br>
-            <h1 class="hat-style">{{ store.name_store }} {{ store.name_rating }}</h1>
-            <h4>{{ store.city }}, {{ store.address }}</h4>
-            <br><h4>{{ store.number_phone }}</h4>
-            <div>
+            <p class="name__shop">{{ store.name_store }}</p>
+            <p class="address__shop">{{ store.city }}, {{ store.address }}</p>
+            <br>
+
+            <div class="open__hours">
+                <img src="{% static 'img/phone.png' %}" class="image__open__hours">
+                <p class="">{{ store.number_phone }}</p>
+            </div>
+
+            <div class="">
                 {% for inf in store.list_days_open_hours %}
-                    <h4>{{ inf }}</h4>
+                    <div class="open__hours">
+                        <img src="{% static 'img/time.png' %}" class="image__open__hours">
+                        <p class="open__hours">{{ inf }}</p>
+                    </div>
                 {% endfor %}
             </div>
+
             <div class="soc-network-img">
-                <a href="{{ store.link }}">
-                    <img src="{{ store.store_network.image.url }}" height="50" width="50"></a>
-                {% for list in store.list_links %}
-                    <a href="{{ list.0 }}">
-                        <img src="{% static list.1 %}" width="50" height="50"></a>
+                <div class="img__soc__network">
+                    <a href="{{ store.link }}">
+                    <img src="{{ store.store_network.image.image.url }}" height="40" width="40"></a>
+                </div>
+                {% for link in store.list_links %}
+                    <div class="img__soc__network">
+                        <a href="{{ link.0 }}">
+                            <img src="{% static link.1 %}" width="40" height="40"></a>
+                    </div>
                 {% endfor %}
             </div>
         </div>
-        <div class="col-sm">
+
+        <div class="store__image">
+
             <div class="container__img">
                 {% if photo %}
                     <div class="">
                         <img src="{{ store.img.image.url }}" alt="Snow" style="width:100%">
                     </div>
                 {% else %}
+
                     <div class="map-shop" id="map"></div>
                 {% endif %}
+
                 <div>
                     <form action="{% url 'shop' %}" method="get">
                         <div>
@@ -58,44 +76,64 @@
                 </div>
             </div>
         </div>
-    </div>
-</div><br>
-<div class="container__promotions">
-    {% for key, value in store.dict_catalog_prom_days.items %}
-        <div class="cont-day">
-            {% if key == today %}
-                <div class="day">
-                    <h4>{{ key }}</h4>
-                </div>
-            {% else %}
-                <h4>{{ key }}</h4>
-            {% endif %}
+    </div><br>
 
-            {% if value.0.0 %}
-                <h6>{{ value.0.0.general_promotions }}</h6>
-            {% else %}
-                <h6>&nbsp;</h6>
-            {% endif %}
-
-            {% if value.1 %}
-                {% for prom in value.1 %}
-                    {% if prom.gallery.image %}
-                        <div class="photo" data-title="{{ prom.general_promotions }}">
-                            <img src="{{ prom.gallery.image.url }}" width="40" height="40">
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+    {% if store.store_network.name_network == 'Мода Макс' %}
+        <div class="increase__font">
+            <p>{{ store.dict_catalog_prom_days.0.1.0.decoding }}</p>
         </div>
-    {% endfor %}
-</div>
-<br>
-    {% for value in store.dict_catalog_prom_days.values %}
-        {% for sale in value.1 %}
-            <div class="discount__information">
-                <img src="{{ sale.gallery.image.url }}" width="40" height="40">
-                <p>{{ sale.decoding }}</p>
+    {% endif %}
+
+    <div class="container__promotions">
+        {% for key, value in store.dict_catalog_prom_days.items %}
+
+            <div class="cont-day">
+                {% if key == today %}
+
+                    <div class="container__day">
+                        <div class="day">
+                            <p style="red">{{ value.0 }}</p>
+                        </div>
+                    </div>
+
+                {% else %}
+                    <div class="container__day">
+                        <div class="day">
+                            <p>{{ value.0 }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if value.1.0 %}
+                    <div class="container__day">
+                        <p class="discount">{{ value.1.0.general_promotions }}</p>
+                    </div>
+                {% else %}
+                    <div class="container__day">
+                        <p class="discount">&nbsp;</p>
+                    </div>
+                {% endif %}
+
+                {% if value.2 %}
+                    {% for prom in value.2 %}
+                        {% if prom.gallery.image %}
+                            <div class="photo" data-title="{{ prom.general_promotions }}">
+                                <img src="{{ prom.gallery.image.url }}" width="40" height="40">
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </div>
         {% endfor %}
-    {% endfor %}
+    </div>
+    <br>
+    <div class="container__discount__description">
+        {% for img in store.list_unique_discount %}
+            <div class="discount__information">
+                <img src="{{ img.gallery.image.url }}" width="40" height="40">
+                <p class="discount__description">{{ img.decoding }}</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

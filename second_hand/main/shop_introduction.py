@@ -51,6 +51,7 @@ class StoreViewItem:
         self.list_days_open_hours = self.prepare_week_schedule()  # заполнили список днями с рабочим расписанием
         self.list_promotion_days = self.get_promotion_list_by_id()
         # #self.list_catalog_prom_days = self.list_promotion_days[datetime.weekday(date.today()):len(self.list_promotion_days)]
+        self.list_unique_discount = list()
         self.dict_catalog_prom_days = self.converted_to_dict(self.list_promotion_days)
 
     def get_todays_open_hours(self):
@@ -127,23 +128,21 @@ class StoreViewItem:
                     list_temp_sales.append(prom)
                 elif prom.discount_type == 'акция':
                     list_temp_discounts.append(prom)
-            dict_catalog_prom_days[self.list_week[i]] = [list_temp_sales, list_temp_discounts]
+                    if prom not in self.list_unique_discount:
+                        self.list_unique_discount.append(prom)
+            dict_catalog_prom_days[i] = [self.list_week[i], list_temp_sales, list_temp_discounts]
 
         return dict_catalog_prom_days
 
     def get_package_links(self, store_network):
         list_temp_links = list()
         list_links = [
-            [store_network.links.link_home_page, 'img/moda_max_logo.png'],
-            [store_network.links.inst, 'img/instagram.png'],
-            [store_network.links.vk, 'img/vk.png'],
-            [store_network.links.tik_tok, 'img/tik_tok.jfif'],
-            [store_network.links.classmates, 'img/odnoklassniki.png'],
-            [store_network.links.facebook, 'img/facebook.png'],
-            [store_network.links.telegram, 'img/telegram.svg'],
+            [store_network.inst, 'img/instagram.png'],
+            [store_network.vk, 'img/vk.png'],
+            [store_network.tik_tok, 'img/tiktok.png'],
+            [store_network.classmates, 'img/odnoklassniki.png'],
         ]
-        for i in range(len(list_links)):
-            if i != 0:
-                if list_links[i][0]:
-                    list_temp_links.append(list_links[i])
+        for link in list_links:
+            if link[0]:
+                list_temp_links.append(link)
         return list_temp_links

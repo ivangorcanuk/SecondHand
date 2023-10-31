@@ -5,28 +5,37 @@
 [class*="copyrights-pane"] {
     display: none !important;
 }
+.img__soc__network {
+    margin-right: 10px; /* отступы */
+}
 .soc-network-img {
-    display: flex; /* размемтил элементы шапки в ряд */
-    margin-right: 30px; /* отступы */
+    padding-top: 30px;
+    display: flex;
 }
 .cont-day {
     box-shadow: 10px 10px 40px 20px #0000001A; /* тени */
     /* background-color: #d3d3d3; */
-    width: 90px;
-    height: 120px;
+    width: 150px;
+    height: 180px;
     text-align: center;
     margin-left: 5px; /* отступ слева */
     margin-right: 30px; /* отступ слева */
     padding-top: 10px; /* отступил от верха */
 }
 .photo {
+    padding-top: 5px; /* отступил от верха */
     display: inline-block; /* Строчно-блочный элемент */
     position: relative; /* Относительное позиционирование */
 }
 .day {
-    color: red; /* цвет */
+    font-size: 25px; /* размер шрифта */
+    font-weight: 700; /* жирный шрифт */
+}
+.discount {
+    font-size: 18px; /* размер шрифта */
 }
 .container__promotions {
+    padding-top: 10px; /* отступил от верха */
     display: flex;
     justify-content: center;
 }
@@ -34,6 +43,17 @@
     display: flex;
     align-items: center; /* выравнял элементы по центру картинки */
 }
+.discount__description {
+    margin-left: 10px; /* отступ слева */
+}
+.store__image {
+    margin-left: 300px;
+}
+.container__information__and__image {
+    display: flex;
+    padding-top: 20px; /* отступил от верха */
+}
+
 .container__img {
     position: relative;
     width: 100%;
@@ -79,4 +99,31 @@
 }
 .container__img .btn__map:hover {
     background-color: black;
+}
+.increase__font {
+    font-size: 1.3rem;
+}
+.open__hours {
+    display: flex;
+    align-items: center;
+}
+.image__open__hours {
+    height: 20px;
+    width: 20px;
+    margin-right: 10px;
+}
+.name__shop {
+    font-weight: 600; /* жирный шрифт */
+    font-size: 25px; /* размер шрифта */
+}
+.address__shop {
+    font-weight: 400; /* жирный шрифт */
+    font-size: 18px; /* размер шрифта */
+}
+.container__day {
+    padding-top: 5px; /* отступил от верха */
+}
+.container__discount__description {
+    display: flex;
+    margin-bottom: 30px; /* отступил вниз */
 }

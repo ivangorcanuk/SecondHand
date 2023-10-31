@@ -77,29 +77,69 @@
                         <div class="cont-day">
                             {% if key == today %}
                                 <div class="day">
-                                    <h6>{{ key }}</h6>
+                                    <h6>{{ value.0 }}</h6>
                                 </div>
+
+                                {% if value.1.0 %}
+                                    <p>{{ value.1.0.general_promotions }}</p>
+                                    {% else %}
+                                    <p>&nbsp;</p>
+                                    {% endif %}
+
+                                    {% if value.2 %}
+                                        {% for prom in value.2 %}
+                                            {% if prom.gallery.image %}
+                                                <div class="img__sale" data-title="{{ prom.general_promotions }}">
+                                                    <img src="{{ prom.gallery.image.url }}" width="30" height="30">
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+
+                            {% elif key > today %}
+                                <div class="">
+                                    <h6>{{ value.0 }}</h6>
+                                </div>
+
+                                {% if value.1.0 %}
+                                    <p>{{ value.1.0.general_promotions }}</p>
+                                    {% else %}
+                                    <p>&nbsp;</p>
+                                    {% endif %}
+
+                                    {% if value.2 %}
+                                        {% for prom in value.2 %}
+                                            {% if prom.gallery.image %}
+                                                <div class="img__sale" data-title="{{ prom.general_promotions }}">
+                                                    <img src="{{ prom.gallery.image.url }}" width="30" height="30">
+                                                </div>
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+
                             {% else %}
                                 <div class="today">
-                                    <h6>{{ key }}</h6>
+                                    <h6>{{ value.0 }}</h6>
+
+                                {% if value.1.0 %}
+                                    <p>{{ value.1.0.general_promotions }}</p>
+                                    {% else %}
+                                    <p>&nbsp;</p>
+                                {% endif %}
+
+                                {% if value.2 %}
+                                    {% for prom in value.2 %}
+                                        {% if prom.gallery.image %}
+                                            <div class="img__sale" data-title="{{ prom.general_promotions }}">
+                                                <img src="{{ prom.gallery.image.url }}" class="" width="30" height="30">
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
                                 </div>
+
                             {% endif %}
 
-                            {% if value.0.0 %}
-                            <p>{{ value.0.0.general_promotions }}</p>
-                            {% else %}
-                            <p>&nbsp;</p>
-                            {% endif %}
-
-                            {% if value.1 %}
-                                {% for prom in value.1 %}
-                                    {% if prom.gallery.image %}
-                                        <div class="img__sale" data-title="{{ prom.general_promotions }}">
-                                            <img src="{{ prom.gallery.image.url }}" width="30" height="30">
-                                        </div>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
                         </div>
 
                     {% endfor %}

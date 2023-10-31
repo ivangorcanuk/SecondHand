@@ -4,35 +4,26 @@ from pytils.translit import slugify
 import datetime
 
 
-class LinkSocNetworks(models.Model):  # ссылки на соц сети и официальный сайт
-    link_home_page = models.URLField(blank=True)  # website
-    inst = models.URLField(blank=True)
-    vk = models.URLField(blank=True)
-    tik_tok = models.URLField(blank=True)
-    classmates = models.URLField(blank=True)
-    facebook = models.URLField(blank=True)
-    telegram = models.URLField(blank=True)
+class Gallery(models.Model):
+    image = models.FileField(upload_to='shop_gallery')
 
     def __str__(self):
-        return f'{self.link_home_page}'
+        return f'{self.image}'
 
 
 class StoreNetwork(models.Model):  # сети магазинов
     name_network = models.CharField(max_length=50)  # название сети магазинов
     discount_card = models.CharField(max_length=50)  # дисконтная карта
     description = models.TextField()  # описание
-    image = models.FileField(upload_to='store_network_logo', null=True, blank=True)
-    links = models.ForeignKey(LinkSocNetworks, on_delete=models.CASCADE, null=True)  # id сети магазинов
+    image = models.ForeignKey(Gallery, on_delete=models.CASCADE, null=True, blank=True)
+    link_home_page = models.URLField(null=True, blank=True)  # website
+    inst = models.URLField(null=True, blank=True)
+    vk = models.URLField(null=True, blank=True)
+    tik_tok = models.URLField(null=True, blank=True)
+    classmates = models.URLField(null=True, blank=True)
 
     def __str__(self):
         return f'{self.name_network}'
-
-
-class Gallery(models.Model):
-    image = models.FileField(upload_to='shop_gallery')
-
-    def __str__(self):
-        return f'{self.image}'
 
 
 class OpenHours(models.Model):  # рабочее время

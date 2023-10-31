@@ -24,7 +24,7 @@ function init() {
         balloonContentFooter: time_work,
         },{
         iconLayout: 'default#image', // указали, что будем использовать свой стиль для метки
-        iconImageHref: 'static/img/map-point.png', // используем выбранный нами стиль метки
+        iconImageHref: 'static/img/marker.png', // используем выбранный нами стиль метки
         iconImageSize: [30, 30], // используем выбранный нами стиль метки
         iconImageOffset: [-14, -25], // отступ от центра
         });

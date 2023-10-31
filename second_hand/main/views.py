@@ -50,7 +50,8 @@ class Catalog:
     def catalog(self, request):
         self.data['form_filters'] = self.form_filters
         self.data['list_shops_presentation'] = self.list_shops
-        self.data['today'] = StoreViewItem.list_week[datetime.weekday(date.today())]
+        self.data['today'] = datetime.weekday(date.today())
+        self.data['bool'] = False
         return render(request, 'main/catalog.html', context=self.data)
 
     def handle_search(self, request):

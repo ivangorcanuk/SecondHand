@@ -32,8 +32,10 @@
 }
 
                                /* catalog */
+
 .today {
-    color: #C0C0C0; цвет */
+    color: #C0C0C0; /* цвет */
+    filter: grayscale(1);
 }
 .img__shop {
     margin-left: 30px; /* отступ слева */

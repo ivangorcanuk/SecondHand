@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import StoreNetwork, Stores, LinkSocNetworks, OpenHours, PromotionDays, PromotionsRegister, Gallery
+from .models import StoreNetwork, Stores, OpenHours, PromotionDays, PromotionsRegister, Gallery
 
 
 @admin.register(StoreNetwork)
@@ -9,15 +9,6 @@ class StoreNetwork(admin.ModelAdmin):
 
     def __str__(self):
         return f'{self.name_network} - {self.discount_card} - {self.description}'
-
-
-@admin.register(LinkSocNetworks)
-class LinkSocNetworks(admin.ModelAdmin):
-    list_display = ['link_home_page', 'inst', 'vk', 'tik_tok', 'classmates', 'facebook', 'telegram']
-    #list_editable = ['discount_card', 'description']  # список изменения полей
-
-    def __str__(self):
-        return f'{self.link_home_page} - {self.inst} - {self.vk} - {self.tik_tok} - {self.classmates} - {self.facebook} - {self.telegram}'
 
 
 @admin.register(Stores)

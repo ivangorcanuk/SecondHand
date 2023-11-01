@@ -10,6 +10,7 @@ from .db_interaction_handler import DBInteractionHandler
 from .shop_introduction import StoreViewItem
 from .shops_data_controller import ShopsDataController
 from django.views.generic import ListView
+from .models import *
 from django.http import HttpResponse, HttpResponseRedirect
 import requests
 import re
@@ -20,8 +21,10 @@ from django.db.models import Q
 # создать переменную объекта класса Базы данных и польлозоваться ею во всех классах или в каждом классе создавать свою переменную
 
 
-def index(request):
-    return render(request, 'main/index.html')
+class HomePage(ListView):
+    model = Stores
+    template_name = 'main/index.html'
+    context_object_name = 'stor'
 
 
 class Catalog:
@@ -209,35 +212,26 @@ class Stor:
         return render(request, 'main/store.html', context=self.data)
 
 
-class Map:
-    db = DBInteractionHandler()
+class Map(ListView):
+    model = Stores
+    template_name = 'main/map.html'
+    context_object_name = 'store'
 
-    def __init__(self):
-        self.all_shop = self.db.base_shop
-        self.list_shops = self.convert_to_view_item(self.all_shop)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        list_shop_presentation = list()
+        for shop in context['store']:  # прошлись по таблице с магазинами и отправили данные в класс представления
+            st = StoreViewItem(shop.id, shop.name_store, shop.country, shop.city, shop.address, shop.number_phone,
+                               shop.number_stars, shop.rating, shop.size, shop.store_network, shop.open_hours,
+                               shop.promotion_days, shop.img, shop.latitude, shop.longitude, shop.link_shop)
+            list_shop_presentation.append(st)
 
-    def map(self, request):
-        data = dict()
-        list_geolocation = list()
-        for i in range(5):
-            list_geolocation.append(self.get_geolocation(i))
-        data['data'] = json.dumps(list_geolocation)
-        return render(request, 'main/map.html', context=data)
-
-    def get_geolocation(self, condition):
-        list_temp = list()
-        if condition == 1:
-            condition = 'Мода Макс'
-        elif condition == 2:
-            condition = 'Эконом Сити'
-        elif condition == 3:
-            condition = 'Адзенне'
-        elif condition == 4:
-            condition = 'Мегахенд'
-        else:
-            condition = 'Все'
-
-        for shop in self.list_shops:
+        list_shops_all = list()
+        list_shops_modamax = list()
+        list_shops_economcity = list()
+        list_shops_adzene = list()
+        list_shops_megahend = list()
+        for shop in list_shop_presentation:
             dict_temp = dict()
             dict_temp['lat'] = shop.latitude
             dict_temp['lon'] = shop.longitude
@@ -246,20 +240,20 @@ class Map:
             dict_temp['phone'] = shop.number_phone
             dict_temp['link'] = shop.link
             dict_temp['time_work'] = shop.opening_hours_today_text
-            if condition == shop.name_store:
-                list_temp.append(dict_temp)
-            elif condition == 'Все':
-                list_temp.append(dict_temp)
-        return list_temp
 
-    def convert_to_view_item(self, base_shop):
-        list_shop_presentation = list()
-        for shop in base_shop:  # прошлись по таблице с магазинами и отправили данные в класс представления
-            st = StoreViewItem(shop.id, shop.name_store, shop.country, shop.city, shop.address, shop.number_phone,
-                               shop.number_stars, shop.rating, shop.size, shop.store_network, shop.open_hours,
-                               shop.promotion_days, shop.img, shop.latitude, shop.longitude, shop.link_shop)
-            list_shop_presentation.append(st)
-        return list_shop_presentation
+            list_shops_all.append(dict_temp)
+            if shop.store_network.name_network == 'Мода Макс':
+                list_shops_modamax.append(dict_temp)
+            elif shop.store_network.name_network == 'Эконом Сити':
+                list_shops_economcity.append(dict_temp)
+            elif shop.store_network.name_network == 'Адзенне':
+                list_shops_adzene.append(dict_temp)
+            elif shop.store_network.name_network == 'Мегахенд':
+                list_shops_megahend.append(dict_temp)
+        context['data'] = json.dumps([list_shops_all, list_shops_modamax,
+                                      list_shops_economcity, list_shops_adzene, list_shops_megahend])
+
+        return context
 
 
 def about(request):

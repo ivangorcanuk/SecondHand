@@ -9,7 +9,7 @@ from django.shortcuts import render
 from .db_interaction_handler import DBInteractionHandler
 from .shop_introduction import StoreViewItem
 from .shops_data_controller import ShopsDataController
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView, FormView
 from .models import *
 from django.http import HttpResponse, HttpResponseRedirect
 import requests
@@ -17,6 +17,8 @@ import re
 from datetime import datetime, date, timedelta
 from .forms import SearchForm, FiltersForm, list_sales, list_discounts
 from django.db.models import Q
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 # создать переменную объекта класса Базы данных и польлозоваться ею во всех классах или в каждом классе создавать свою переменную
 
@@ -25,6 +27,32 @@ class HomePage(ListView):
     model = Stores
     template_name = 'main/index.html'
     context_object_name = 'stor'
+
+
+class Cataloge(ListView):
+    model = Stores
+    template_name = 'main/catalog.html'
+    context_object_name = 'stor'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        list_shop_presentation = list()
+        for shop in context['stor']:
+            st = StoreViewItem(shop.id, shop.name_store, shop.country, shop.city, shop.address, shop.number_phone,
+                               shop.number_stars, shop.rating, shop.size, shop.store_network, shop.open_hours,
+                               shop.promotion_days, shop.img, shop.latitude, shop.longitude, shop.link_shop)
+            list_shop_presentation.append(st)
+
+        context['search'] = True
+        context['form_search'] = SearchForm()
+        context['form_filters'] = FiltersForm()
+        context['list_social_discounts'] = ['Пенсионерам', 'Студентам', 'Детям', 'Семейные', 'На всё от 80%']
+        context['list_shops_presentation'] = list_shop_presentation
+        context['today'] = datetime.weekday(date.today())
+        # a = ShopsDataController()
+        # a.start()
+        return context
 
 
 class Catalog:
@@ -54,7 +82,9 @@ class Catalog:
         self.data['form_filters'] = self.form_filters
         self.data['list_shops_presentation'] = self.list_shops
         self.data['today'] = datetime.weekday(date.today())
-        self.data['bool'] = False
+        #self.data['bool'] = False
+        # a = ShopsDataController()
+        # a.start()
         return render(request, 'main/catalog.html', context=self.data)
 
     def handle_search(self, request):
@@ -167,49 +197,45 @@ class Catalog:
         return render(request, 'main/catalog.html', context=self.data)
 
 
-class Stor:
-    db = DBInteractionHandler()
+class Store(DetailView):
+    model = Stores
+    template_name = 'main/store.html'
+    context_object_name = 'stor'
 
-    def __init__(self):
-        self.id_store = int()
-        self.store = None
-        self.data = dict()
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(id=self.kwargs['pk'])
 
-    def stor(self, request, id_store: int):
-        # a = ShopsDataController()
-        # a.start()
-        self.id_store = id_store
-        shop = self.db.get_shop(id_store)
-        store = StoreViewItem(shop.id, shop.name_store, shop.country, shop.city, shop.address, shop.number_phone,
-                              shop.number_stars, shop.rating, shop.size, shop.store_network, shop.open_hours,
-                              shop.promotion_days, shop.img, shop.latitude, shop.longitude, shop.link_shop)
-        print(self.id_store)
-        self.data = {
-            'store': store,
-            'img': id_store,
-            'photo': True,
-            'today': StoreViewItem.list_week[datetime.weekday(date.today())]
-        }
-        return render(request, 'main/store.html', context=self.data)
-
-    def shop_map(self, request):
-        if request.GET['photo_or_map'] == 'Карта':
-            self.data['photo'] = False
-        else:
-            self.data['photo'] = True
-        self.data['data'] = json.dumps(
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        shop = context['stor']
+        context['store'] = StoreViewItem(shop.id, shop.name_store, shop.country, shop.city, shop.address, shop.number_phone,
+                                         shop.number_stars, shop.rating, shop.size, shop.store_network, shop.open_hours,
+                                         shop.promotion_days, shop.img, shop.latitude, shop.longitude, shop.link_shop)
+        context['isPhotoButtonClicked'] = False
+        context['today']: StoreViewItem.list_week[datetime.weekday(date.today())]
+        context['data'] = json.dumps(
             [
                 {
-                    'name': self.data['store'].name_store,
-                    'address': self.data['store'].address,
-                    'phone': self.data['store'].number_phone,
-                    'time_work': self.data['store'].opening_hours_today_text,
-                    'lat': self.data['store'].latitude,
-                    'lon': self.data['store'].longitude,
+                    'name': context['store'].name_store,
+                    'address': context['store'].address,
+                    'phone': context['store'].number_phone,
+                    'time_work': context['store'].opening_hours_today_text,
+                    'lat': context['store'].latitude,
+                    'lon': context['store'].longitude,
                 }
             ]
         )
-        return render(request, 'main/store.html', context=self.data)
+        return context
+
+
+class JsonFilterMoviesView(ListView):
+    """Фильтр фильмов в json"""
+
+    def get(self, request, *args, **kwargs):
+        print('qwe')
+        queryset = False
+        return JsonResponse({"isPhotoButtonClicked": queryset})
 
 
 class Map(ListView):
@@ -256,52 +282,13 @@ class Map(ListView):
         return context
 
 
-def about(request):
-    form_search = SearchForm()
-    form_filters = FiltersForm()
-    data = {
-        'form_search': form_search,
-        'form_filters': form_filters,
-        'list_name_network': ['Мода Макс', 'Эконом Сити', 'Адзенне', 'Мегахенд'],
-    }
-    return render(request, 'main/about.html', context=data)
+class About(ListView):
+    model = Stores
+    template_name = 'main/about.html'
+    context_object_name = 'stor'
 
 
-def news(request):
-    return render(request, 'main/news.html')
-
-# class Index(ListView):
-#     template_name = 'main/index.html'
-#     model = Stores
-#
-#     def get_context_data(self, **kwargs):
-#         context = super(Index, self).get_context_data(**kwargs)
-#         list_shop_presentation = list()  # список представления магазинов
-#         base_shop = Stores.objects.all()
-#         for store in base_shop:  # прошлись по таблице с магазинами и отправили данные в класс представления
-#             print(store.address)
-#             st = Store(store.id, store.name_store, store.country, store.city, store.address,
-#                        store.number_phone, store.number_stars, store.rating,
-#                        store.store_network, store.open_hours, store.promotion_days)
-#             list_shop_presentation.append(st)
-#         context['list_shop_presentation'] = list_shop_presentation
-#         return context
-
-
-# class Map(ListView):
-#     template_name = 'main/map.html'
-#     model = Stores
-#     mo_12 = Stores.objects.all()
-#     for store in mo_12:
-#         store.save()
-
-
-# class Store(ListView):
-#     template_name = 'main/store.html'
-#     model = Stores
-#
-#     def get_context_data(self, **kwargs):
-#         context = super(Store, self).get_context_data(**kwargs)
-#         context['set'] = OpenHours.objects.all()
-#         cur = datetime.now()
-#         return context
+class News(ListView):
+    model = Stores
+    template_name = 'main/news.html'
+    context_object_name = 'stor'

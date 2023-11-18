@@ -62,12 +62,11 @@ class ModaMaxParserDataProcessor(DataProcessorBase):
             dict_schedule = DataProcessorBase.get_schedule(self, value[-1].text)
             dict_discounts = self.get_discount(value[:-1])
             self._list_shops.append(ShopsData(key, dict_schedule, dict_discounts))
-            if key == 'ул. Веры Хоружей, 8':
-                print(key)
-                for key, value in dict_schedule.items():
-                    print(key, value)
-                for key, value in dict_discounts.items():
-                    print(key, value)
+            print(key)
+            for key, value in dict_schedule.items():
+                print(key, value)
+            for key, value in dict_discounts.items():
+                print(key, value)
         return self._list_shops
 
     def get_discount(self, many_descaunt):
@@ -192,7 +191,7 @@ class AdzenneParserDataProcessor(DataProcessorBase):
         ('Крама па вул. Русіянава, 7', 'ул. Руссиянова, 7'),
         ('Крама па вул. Сярова, 3а', 'ул. Серова, 3а'),
         ('Крама па вул. Л. Бяды, 39', 'ул. Леонида Беды, 39'),
-        ('Крама па вул. В. Харужай, 8', 'ул. Веры Хоружей, 8')
+        ('Крама па вул. В. Харужай, 8 (Камароўка)', 'ул. Веры Хоружей, 8')
     ]
 
     def __init__(self):
@@ -210,12 +209,11 @@ class AdzenneParserDataProcessor(DataProcessorBase):
             dict_discounts = self.get_discount(value[:-1])
             dict_schedule = self.update_special_day(dict_discounts, dict_schedule)
             self._list_shops.append(ShopsData(street, dict_schedule, dict_discounts))
-            if street == 'ул. Веры Хоружей, 8':
-                print(street)
-                for key, value in dict_schedule.items():
-                    print(key, value)
-                for key, value in dict_discounts.items():
-                    print(key, value)
+            print(street)
+            for key, value in dict_schedule.items():
+                print(key, value)
+            for key, value in dict_discounts.items():
+                print(key, value)
         return self._list_shops
 
     def translate_street_bel(self, street_by):

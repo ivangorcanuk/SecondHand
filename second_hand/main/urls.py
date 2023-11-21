@@ -4,10 +4,10 @@ from . import views
 
 urlpatterns = [
     path('', views.HomePage.as_view(), name='home'),
-    path('catalog', views.Cataloge.as_view(), name='catalog'),
-    path('search', views.Catalog().handle_search, name='search'),
-    path('filter', views.Catalog().handle_filtering, name='filter'),
-    path('pensioner/<str:discount>', views.Catalog().pensioners, name='pensioner'),
+    path('catalog', views.Catalog.as_view(), name='catalog'),
+    path('search', views.SearchHandlerView.as_view(), name='search'),
+    path('filter', views.FilterHandlerView.as_view(), name='filter'),
+    path('social_discount/<str:discount>', views.SocialDiscountsView.as_view(), name='social_discount'),
     path('store/<int:pk>', views.Store.as_view(), name='store'),
     path('map', views.Map.as_view(), name='map'),
     path('about', views.About.as_view(), name='about'),

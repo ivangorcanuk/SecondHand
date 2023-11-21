@@ -14,7 +14,7 @@
 <div class="container__discounts__all">
     {% for discount in list_social_discounts %}
         <div class="col-sm">
-            <a class="hat-style-discounts" href="{% url 'pensioner' discount %}">{{ discount }}</a>
+            <a class="hat-style-discounts" href="{% url 'social_discount' discount %}">{{ discount }}</a>
         </div>
     {% endfor %}
 </div>
